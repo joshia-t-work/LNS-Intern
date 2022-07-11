@@ -94,25 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2252984794623588692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6316548942328300694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e6c501b81a63d478b9c66f4e423688, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isPooled: 0
-  poolableType: {fileID: 11400000, guid: 8f5b39209e948d340a6072402d0fd237, type: 2}
-  _healthbar: {fileID: 6316548940841419516}
-  _character: {fileID: 6316548942562589792}
-  _canShoot: 0
-  _runOnSight: 0
-  _patrolPoints: []
 --- !u!120 &842362237916767202
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -211,3 +192,24 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &2252984794623588692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6316548942328300694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e6c501b81a63d478b9c66f4e423688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPooled: 0
+  poolableType: {fileID: 11400000, guid: 8f5b39209e948d340a6072402d0fd237, type: 2}
+  _healthbar: {fileID: 6316548940841419516}
+  _character: {fileID: 6316548942562589792}
+  _meleeSprite: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
+  _gunSprite: {fileID: 21300000, guid: 81bee05057191784fb9dcdfc56717ba1, type: 3}
+  _canShoot: 0
+  _runOnSight: 0
+  PatrolPoints: []

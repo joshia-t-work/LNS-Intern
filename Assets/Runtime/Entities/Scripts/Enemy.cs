@@ -20,6 +20,7 @@ namespace LNS.Entities
             base.Awake();
             _spawnPosition = transform.position;
             _respawnTime = 3f;
+            SwitchStance();
         }
         private void Update()
         {
@@ -64,7 +65,7 @@ namespace LNS.Entities
                         _sightLocked = 1f;
                         if (_sightLockState == 3)
                         {
-                            Fire();
+                            Attack();
                         }
                     }
                     switch (_sightLockState)

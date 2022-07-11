@@ -8,7 +8,15 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3063910735426833940, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3063910735426833940, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3063910735426833940, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
+      propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3063910736195018724, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
@@ -63,6 +71,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
+    - target: {fileID: 3063910736865900919, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3063910736865900919, guid: 664b318685f993d4fbde499c989bec1d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -126,25 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4470398309073823206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4596251344462583640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35b2f4ac11a9f3c45817360936c80d84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isPooled: 0
-  poolableType: {fileID: 11400000, guid: 17c9f59a323e7264289729db20db8a55, type: 2}
-  _healthbar: {fileID: 4596251343000867122}
-  _character: {fileID: 4596251344562319278}
-  _meleeSprite: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
-  _gunSprite: {fileID: 21300000, guid: 81bee05057191784fb9dcdfc56717ba1, type: 3}
-  _cam: {fileID: 0}
 --- !u!120 &2588730173782897231
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -243,3 +236,94 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &4470398309073823206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4596251344462583640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b2f4ac11a9f3c45817360936c80d84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPooled: 0
+  poolableType: {fileID: 11400000, guid: 17c9f59a323e7264289729db20db8a55, type: 2}
+  _healthbar: {fileID: 4596251343000867122}
+  _character: {fileID: 4596251344562319278}
+  _meleeSprite: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
+  _gunSprite: {fileID: 21300000, guid: 81bee05057191784fb9dcdfc56717ba1, type: 3}
+  _cam: {fileID: 0}
+--- !u!114 &5149874997730005971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4596251344462583640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a40df3b940ae0e4aba4257fa1295878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _WASDInput:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4470398309073823206}
+        m_TargetAssemblyTypeName: LNS.Entities.Entity, Assembly-CSharp
+        m_MethodName: SetMoveDirection
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _mouseAimInput:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4470398309073823206}
+        m_TargetAssemblyTypeName: LNS.Entities.Soldier, Assembly-CSharp
+        m_MethodName: SetAimDirection
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _mouseClickInput:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4470398309073823206}
+        m_TargetAssemblyTypeName: LNS.Entities.Soldier, Assembly-CSharp
+        m_MethodName: Attack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _spacebarInput:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4470398309073823206}
+        m_TargetAssemblyTypeName: LNS.Entities.Soldier, Assembly-CSharp
+        m_MethodName: SwitchStance
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
