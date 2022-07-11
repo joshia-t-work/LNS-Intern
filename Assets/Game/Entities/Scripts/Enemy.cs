@@ -12,7 +12,7 @@ namespace LNS.Entities
         [Header("Dummy Settings")]
         [SerializeField] bool _canShoot;
         [SerializeField] bool _runOnSight;
-        [SerializeField] Vector3[] _patrolPoints;
+        [SerializeField] public Vector3[] PatrolPoints;
         Vector3 _spawnPosition;
         private int _patrolIndex = 0;
         public override void Awake()
@@ -42,16 +42,16 @@ namespace LNS.Entities
             _sightLocked -= Time.deltaTime;
             //Vector2 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             //SetMoveDirection(inputDirection);
-            if (_patrolPoints.Length > 0)
+            if (PatrolPoints.Length > 0)
             {
-                if (Vector3.Distance(transform.position, _patrolPoints[_patrolIndex]) < 1f)
+                if (Vector3.Distance(transform.position, PatrolPoints[_patrolIndex]) < 1f)
                 {
-                    _patrolIndex = (_patrolIndex + 1) % _patrolPoints.Length;
+                    _patrolIndex = (_patrolIndex + 1) % PatrolPoints.Length;
                 }
-                SetMoveDirection(_patrolPoints[_patrolIndex] - transform.position);
+                SetMoveDirection(PatrolPoints[_patrolIndex] - transform.position);
                 if (!_canShoot)
                 {
-                    SetAimDirection(_patrolPoints[_patrolIndex] - transform.position);
+                    SetAimDirection(PatrolPoints[_patrolIndex] - transform.position);
                 }
             }
             if (isPlayerVisible)
