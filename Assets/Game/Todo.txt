@@ -1,0 +1,19 @@
+[Done] Karakter Player dengan Input Controller WASD untuk Bergerak di permukaan.
+[Done] Player punya Pistol untuk Menembaki Peluru dan Pedang untuk menyerang jarak dekat. Player juga dapat mengganti senjata dengan menggunakan Input Tombol apa pun.
+[Done] Buat Dummy Enemy sebagai target musuh dengan sifat sebagai berikut: 
+    [Done] Musuh yang bergerak dengan Jalur yang berulang tetapi tidak dapat menyerang.
+    [Done] Musuh yang diam tetapi bisa menembaki Player.
+    [Done] Musuh yang dapat bergerak dengan Jalur yang berulang dan bisa menembak ke arah yang Random.
+    [Done] Musuh yang diam tetapi kabur saat Player mendekatinya.
+[Done] Gunakan Mouse Controller untuk mengarahkan serangan dan Klik Kiri untuk menembak atau menebas musuh. [ Mekanik Menyerang dibebaskan, Buatlah Sekreatif Mungkin ]
+[Done] Player dan Enemy hanya memiliki 3 Nyawa dan keduanya bisa mati.
+[Done] Jika Player Utama Mati, tunggu 5 Detik, lalu Player Respawn. Sistem ini berlaku juga untuk Enemy tetapi dengan waktu respawn yang berbeda.
+[Done] Kamera akan selalu mengikuti Player Utama. Apabila Pemain Dibunuh oleh Enemy, targetkan Kamera ke Musuh yang membunuhnya. Kamera kembali menargetkan ke Player Utama apabila sudah Respawn.
+
+
+Additionals
+[    ] Change bullets to projectiles
+[    ] Add gun spread, change AI aim behaviour
+[    ] AI movement controller
+[    ] Add animations and polish UI
+[    ] Add dummy level
