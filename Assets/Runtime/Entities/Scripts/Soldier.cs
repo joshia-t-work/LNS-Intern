@@ -9,7 +9,6 @@ namespace LNS.Entities
     /// <summary>
     /// A damagable entity that has movement, aiming and respawning behaviour
     /// </summary>
-    [RequireComponent(typeof(LineRenderer))]
     public class Soldier : Entity
     {
         #region Variables
@@ -66,6 +65,8 @@ namespace LNS.Entities
                 _healthbar.value = (float)value / MaxHealth.Value;
             });
             _collider = GetComponentsInChildren<Collider2D>();
+            _isGun = true;
+            SwitchStance();
         }
         public override void FixedUpdate()
         {
@@ -108,10 +109,12 @@ namespace LNS.Entities
             _isGun = !_isGun;
             if (_isGun)
             {
+                _moveSpeed = 1.5f;
                 _characterSprite.sprite = _gunSprite;
             }
             else
             {
+                _moveSpeed = 2f;
                 _characterSprite.sprite = _meleeSprite;
             }
         }

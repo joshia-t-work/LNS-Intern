@@ -151,7 +151,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35b2f4ac11a9f3c45817360936c80d84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPooled: 0
   poolableType: {fileID: 11400000, guid: 17c9f59a323e7264289729db20db8a55, type: 2}
   _healthbar: {fileID: 4596251343000867122}
   _character: {fileID: 4596251344562319278}

@@ -20,10 +20,10 @@ namespace LNS.Entities
         [SerializeField]
         public Vector3[] PatrolPoints;
 
-        private float _sightLocked = 0f;
-        private int _sightLockState = 0;
         Vector3 _spawnPosition;
         private int _patrolIndex = 0;
+        private DirectionalAI _directionalAI;
+        private Vector3 _targetPosition;
 
         #endregion
         #region MonoBehaviour
@@ -33,10 +33,13 @@ namespace LNS.Entities
             base.Awake();
             _spawnPosition = transform.position;
             _respawnTime = 3f;
-            _isGun = true;
+            SwitchStance();
+            _directionalAI = GetComponent<DirectionalAI>();
         }
         private void Update()
         {
+            Vector3 newMoveDirection = Vector3.zero;
+            _targetPosition = _spawnPosition;
             SetMoveDirection(Vector3.zero);
             bool isPlayerVisible = false;
             Poolable[] players = InstancePool.GetInstances("Player");
@@ -53,44 +56,24 @@ namespace LNS.Entities
                     }
                 }
             }
-            _sightLocked -= Time.deltaTime;
             if (PatrolPoints.Length > 0)
             {
                 if (Vector3.Distance(transform.position, PatrolPoints[_patrolIndex]) < 1f)
                 {
                     _patrolIndex = (_patrolIndex + 1) % PatrolPoints.Length;
                 }
-                SetMoveDirection(PatrolPoints[_patrolIndex] - transform.position);
-                if (!_canShoot)
-                {
-                    SetAimDirection(PatrolPoints[_patrolIndex] - transform.position);
-                }
+                _targetPosition = PatrolPoints[_patrolIndex];
+                newMoveDirection = PatrolPoints[_patrolIndex] - transform.position;
             }
             if (isPlayerVisible)
             {
                 if (_canShoot)
                 {
-                    if (_sightLocked < 0f)
+                    if (IsReloaded)
                     {
-                        _sightLockState = (_sightLockState % 3) + 1;
-                        _sightLocked = 1f;
-                        if (_sightLockState == 3)
-                        {
-                            Attack();
-                        }
-                    }
-                    switch (_sightLockState)
-                    {
-                        case 1:
-                            Vector2 aimDirection = InstancePool.GetInstances("Player")[0].transform.position - transform.position;
-                            SetAimDirection(aimDirection);
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                        default:
-                            break;
+                        Vector2 aimDirection = InstancePool.GetInstances("Player")[0].transform.position - transform.position;
+                        SetAimDirection(aimDirection);
+                        Attack();
                     }
                 }
             }
@@ -100,18 +83,26 @@ namespace LNS.Entities
                 {
                     if (Vector3.Distance(transform.position, players[0].transform.position) < 10f)
                     {
-                        SetMoveDirection(transform.position - players[0].transform.position);
+                        newMoveDirection = transform.position - players[0].transform.position;
+                        _targetPosition = transform.position + newMoveDirection.normalized;
                         SetAimDirection(players[0].transform.position - transform.position);
                     }
                 } else
                 {
                     if (Vector3.Distance(transform.position, _spawnPosition) > 5f)
                     {
-                        SetMoveDirection(_spawnPosition - transform.position);
+                        newMoveDirection = _spawnPosition - transform.position;
+                        _targetPosition = _spawnPosition;
                         SetAimDirection(_spawnPosition - transform.position);
                     }
                 }
             }
+            newMoveDirection = _directionalAI.EvaluateDirectionToTarget(transform.position, _targetPosition, newMoveDirection.normalized);
+            if (!_canShoot)
+            {
+                SetAimDirection(newMoveDirection);
+            }
+            SetMoveDirection(newMoveDirection);
         }
 
         #endregion
