@@ -7,20 +7,33 @@ namespace LNS.Entities
 {
     public class Enemy : Soldier
     {
+        #region Variables
+
+        [Header("Dummy Settings")]
+
+        [SerializeField]
+        bool _canShoot;
+
+        [SerializeField]
+        bool _runOnSight;
+
+        [SerializeField]
+        public Vector3[] PatrolPoints;
+
         private float _sightLocked = 0f;
         private int _sightLockState = 0;
-        [Header("Dummy Settings")]
-        [SerializeField] bool _canShoot;
-        [SerializeField] bool _runOnSight;
-        [SerializeField] public Vector3[] PatrolPoints;
         Vector3 _spawnPosition;
         private int _patrolIndex = 0;
+
+        #endregion
+        #region MonoBehaviour
+
         public override void Awake()
         {
             base.Awake();
             _spawnPosition = transform.position;
             _respawnTime = 3f;
-            SwitchStance();
+            _isGun = true;
         }
         private void Update()
         {
@@ -41,8 +54,6 @@ namespace LNS.Entities
                 }
             }
             _sightLocked -= Time.deltaTime;
-            //Vector2 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-            //SetMoveDirection(inputDirection);
             if (PatrolPoints.Length > 0)
             {
                 if (Vector3.Distance(transform.position, PatrolPoints[_patrolIndex]) < 1f)
@@ -75,10 +86,8 @@ namespace LNS.Entities
                             SetAimDirection(aimDirection);
                             break;
                         case 2:
-                            SetGunSight(true);
                             break;
                         case 3:
-                            SetGunSight(false);
                             break;
                         default:
                             break;
@@ -104,10 +113,16 @@ namespace LNS.Entities
                 }
             }
         }
+
+        #endregion
+        #region Class Overrides
+
         public override void OnRespawn()
         {
             base.OnRespawn();
             transform.position = _spawnPosition;
         }
+
+        #endregion
     }
 }

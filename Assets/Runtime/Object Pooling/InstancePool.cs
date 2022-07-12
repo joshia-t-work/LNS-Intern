@@ -9,22 +9,30 @@ namespace LNS.ObjectPooling
     /// </summary>
     public class InstancePool : MonoBehaviour
     {
-        [SerializeField] private Transform[] transforms;
-        public Dictionary<string, Queue<Poolable>> inactivePool = new Dictionary<string, Queue<Poolable>>();
-        public Dictionary<string, List<Poolable>> activePool = new Dictionary<string, List<Poolable>>();
-        public Dictionary<string, Transform> transformList = new Dictionary<string, Transform>();
-        public static InstancePool inst;
+        #region Variables
+
+        [SerializeField]
+        private Transform[] _transforms;
+
+        private Dictionary<string, Queue<Poolable>> _inactivePool = new Dictionary<string, Queue<Poolable>>();
+        private Dictionary<string, List<Poolable>> _activePool = new Dictionary<string, List<Poolable>>();
+        private Dictionary<string, Transform> _transformList = new Dictionary<string, Transform>();
+        public static InstancePool s_inst;
+
+        #endregion
+        #region MonoBehaviour
+
         private void Awake()
         {
-            if (inst == null)
+            if (s_inst == null)
             {
-                inst = this;
-                for (int i = 0; i < transforms.Length; i++)
+                s_inst = this;
+                for (int i = 0; i < _transforms.Length; i++)
                 {
-                    Poolable poolable = transforms[i].GetComponent<Poolable>();
-                    inactivePool.Add(poolable.PoolableType.ObjectName, new Queue<Poolable>());
-                    activePool.Add(poolable.PoolableType.ObjectName, new List<Poolable>());
-                    transformList.Add(poolable.PoolableType.ObjectName, transforms[i]);
+                    Poolable poolable = _transforms[i].GetComponent<Poolable>();
+                    _inactivePool.Add(poolable.PoolableType.ObjectName, new Queue<Poolable>());
+                    _activePool.Add(poolable.PoolableType.ObjectName, new List<Poolable>());
+                    _transformList.Add(poolable.PoolableType.ObjectName, _transforms[i]);
                 }
             }
             else
@@ -32,33 +40,49 @@ namespace LNS.ObjectPooling
                 Destroy(this);
             }
         }
+
+        #endregion
+        #region Class Methods
+
         public static Poolable[] GetInstances(string type)
         {
-            return inst.activePool[type].ToArray();
+            return s_inst._activePool[type].ToArray();
         }
         /// <summary>
         /// Creates an instance of the type from pool or instantiate a new one if it does not exist
         /// </summary>
         /// <param name="type">Type of instance</param>
-        public static void TryInstantiate(string type)
+        /// <returns>A Poolable object</returns>
+        public static Poolable TryInstantiate(string type)
         {
             try
             {
                 Poolable poolable;
-                if (inst.inactivePool[type].Count > 0)
+                if (s_inst._inactivePool[type].Count > 0)
                 {
-                    poolable = inst.inactivePool[type].Dequeue();
+                    poolable = s_inst._inactivePool[type].Dequeue();
                 }
                 else
                 {
-                    poolable = Instantiate(inst.transformList[type]).GetComponent<Poolable>();
+                    poolable = Instantiate(s_inst._transformList[type]).GetComponent<Poolable>();
                 }
                 AddToPool(poolable);
+                return poolable;
             }
             catch (KeyNotFoundException)
             {
-                Debug.LogError("Missing reference for " + type, inst);
+                Debug.LogError("Missing reference for " + type, s_inst);
+                return null;
             }
+        }
+        /// <summary>
+        /// Used to know if the object is spawned manually or from pool (e.g. editor)
+        /// </summary>
+        /// <param name="poolable">pooled object</param>
+        /// <returns>True or false</returns>
+        public static bool IsPooled(Poolable poolable)
+        {
+            return s_inst._activePool[poolable.PoolableType.ObjectName].Contains(poolable);
         }
         /// <summary>
         /// Adds the poolable to the active pool, also fires OnPoolCreate
@@ -67,7 +91,6 @@ namespace LNS.ObjectPooling
         public static void AddToPool(Poolable poolable)
         {
             Reactivate(poolable);
-            poolable.isPooled = true;
             poolable.OnPoolCreate();
         }
         /// <summary>
@@ -79,11 +102,12 @@ namespace LNS.ObjectPooling
             try
             {
                 Deactivate(poolable);
+                s_inst._inactivePool[poolable.PoolableType.ObjectName].Enqueue(poolable);
                 poolable.OnPoolRemove();
             }
             catch (System.Exception)
             {
-                Debug.LogError("Error removing object not pooled: " + poolable, inst);
+                Debug.LogError("Error removing object not pooled: " + poolable, s_inst);
             }
         }
         /// <summary>
@@ -94,11 +118,11 @@ namespace LNS.ObjectPooling
         {
             try
             {
-                inst.activePool[poolable.PoolableType.ObjectName].Remove(poolable);
+                s_inst._activePool[poolable.PoolableType.ObjectName].Remove(poolable);
             }
             catch (KeyNotFoundException)
             {
-                Debug.LogError("Missing reference for " + poolable.PoolableType.ObjectName, inst);
+                Debug.LogError("Missing reference for " + poolable.PoolableType.ObjectName, s_inst);
             }
         }
         /// <summary>
@@ -109,12 +133,14 @@ namespace LNS.ObjectPooling
         {
             try
             {
-                inst.activePool[poolable.PoolableType.ObjectName].Add(poolable);
+                s_inst._activePool[poolable.PoolableType.ObjectName].Add(poolable);
             }
             catch (KeyNotFoundException)
             {
-                Debug.LogError("Missing reference for " + poolable.PoolableType.ObjectName, inst);
+                Debug.LogError("Missing reference for " + poolable.PoolableType.ObjectName, s_inst);
             }
         }
+
+        #endregion
     }
 }

@@ -13,10 +13,10 @@ namespace LNS.Entities
             base.Awake();
             _cam.SetTarget(transform);
         }
-        public override void OnKilled(Damagable other)
+        public override void OnKilledBy(Damagable other)
         {
-            base.OnKilled(other);
-            _cam.SetTarget(other.transform);
+            base.OnKilledBy(other);
+            _cam.SetTarget(other.TraceOwner().transform);
         }
         public override void OnRespawn()
         {

@@ -10,15 +10,20 @@ namespace LNS.ObjectPooling
     /// </summary>
     public abstract class Poolable : MonoBehaviour
     {
-        /// <summary>
-        /// Used to know if the object is spawned manually or from pool (e.g. editor)
-        /// </summary>
-        [HideInInspector] public bool isPooled;
         [Header("Poolable")]
-        [SerializeField] private PoolableScriptableObject poolableType;
+        [SerializeField]
+        private PoolableScriptableObject poolableType;
+
         public PoolableScriptableObject PoolableType
         {
             get { return poolableType; }
+        }
+        public virtual void Start()
+        {
+            if (!InstancePool.IsPooled(this))
+            {
+                InstancePool.AddToPool(this);
+            }
         }
 
         public virtual void OnPoolCreate()

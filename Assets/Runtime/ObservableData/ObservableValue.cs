@@ -7,10 +7,7 @@ namespace LNS.Observable
     {
         public T Value
         {
-            get
-            {
-                return _value;
-            }
+            get { return _value; }
             set
             {
                 _value = value;
@@ -21,7 +18,7 @@ namespace LNS.Observable
         private List<Action<T>> _observers = new List<Action<T>>();
         public ObservableValue(T value)
         {
-            this._value = value;
+            _value = value;
         }
         public void CallObservers()
         {

@@ -12,7 +12,7 @@
 
 
 Additionals
-[    ] Change bullets to projectiles
+[Done] Change bullets to projectiles
 [    ] Add gun spread, change AI aim behaviour
 [    ] AI movement controller
 [    ] Add animations and polish UI
