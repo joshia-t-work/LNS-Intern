@@ -14,8 +14,8 @@
 Additionals
 [Done] Change bullets to projectiles
 [Done] Add gun spread, change AI aim behaviour
-[    ] AI movement controller, increase speed
-[    ] Reduce bullet spread
+[Done] AI movement controller, increase speed
+[Done] Reduce bullet spread
 [    ] Fix point to direction not working on up and down (divided by zero tan)
 [    ] Add animations and polish UI
 [    ] Add dummy level

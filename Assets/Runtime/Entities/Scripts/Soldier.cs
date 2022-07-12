@@ -124,7 +124,7 @@ namespace LNS.Entities
             {
                 _attackCooldown = Time.time;
                 Poolable bullet = InstancePool.TryInstantiate("Bullet");
-                Quaternion leftRotation = Quaternion.Euler(0, 0, Random.Range(-5f,5f));
+                Quaternion leftRotation = Quaternion.Euler(0, 0, Random.Range(-2f,2f));
                 bullet.GetComponent<Bullet>().SetBullet(this, GUNDISTANCE, _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + (Vector3)_currentAimDirection.normalized * 1.2f, leftRotation * AimDirection);
                 //if (_hit.rigidbody != null)
                 //{
