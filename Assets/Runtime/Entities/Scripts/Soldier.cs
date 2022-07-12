@@ -33,11 +33,10 @@ namespace LNS.Entities
         {
             get { return _collider; }
         }
-        private Vector2 _currentAimDirection = Vector2.zero;
         private Vector2 _targetAimDirection = Vector2.zero;
         public Vector2 AimDirection
         {
-            get { return _currentAimDirection; }
+            get { return _characterSprite.transform.right; }
         }
         private RaycastHit2D _hit;
         protected const float GUNDISTANCE = 20f;
@@ -72,14 +71,13 @@ namespace LNS.Entities
         {
             base.FixedUpdate();
 
-            _currentAimDirection = Vector3.RotateTowards(_currentAimDirection, _targetAimDirection, 180f * Mathf.Deg2Rad * Time.deltaTime, 1);
-            float angle = Mathf.Atan2(_currentAimDirection.y, _currentAimDirection.x) * Mathf.Rad2Deg;
-            _characterSprite.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            float angle = Mathf.Atan2(_targetAimDirection.y, _targetAimDirection.x) * Mathf.Rad2Deg;
+            _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
 
-            Vector3 gunDir = (Vector3)_currentAimDirection.normalized;
+            Vector3 gunDir = _characterSprite.transform.right;
             Vector3 gunPosition = _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + gunDir * 1.4f;
             Vector3[] vector3s = new Vector3[] { gunPosition - gunDir * 0.2f, gunPosition + gunDir * GUNDISTANCE };
-            _hit = Physics2D.Raycast(gunPosition, _currentAimDirection, GUNDISTANCE);
+            _hit = Physics2D.Raycast(gunPosition, gunDir, GUNDISTANCE);
             if (_hit.collider != null)
             {
                 vector3s[1] = _hit.point;
@@ -125,7 +123,7 @@ namespace LNS.Entities
                 _attackCooldown = Time.time;
                 Poolable bullet = InstancePool.TryInstantiate("Bullet");
                 Quaternion leftRotation = Quaternion.Euler(0, 0, Random.Range(-2f,2f));
-                bullet.GetComponent<Bullet>().SetBullet(this, GUNDISTANCE, _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + (Vector3)_currentAimDirection.normalized * 1.2f, leftRotation * AimDirection);
+                bullet.GetComponent<Bullet>().SetBullet(this, GUNDISTANCE, _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + _characterSprite.transform.right * 1.2f, leftRotation * AimDirection);
                 //if (_hit.rigidbody != null)
                 //{
                 //    Damagable damagable = _hit.rigidbody.GetComponent<Damagable>();

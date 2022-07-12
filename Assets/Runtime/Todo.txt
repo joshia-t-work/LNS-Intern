@@ -16,6 +16,6 @@ Additionals
 [Done] Add gun spread, change AI aim behaviour
 [Done] AI movement controller, increase speed
 [Done] Reduce bullet spread
-[    ] Fix point to direction not working on up and down (divided by zero tan)
+[Done] Fix point to direction not working on up and down (divided by zero tan)
 [    ] Add animations and polish UI
 [    ] Add dummy level

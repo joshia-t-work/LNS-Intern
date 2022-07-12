@@ -22,7 +22,7 @@ namespace LNS.Entities
         Collider2D[] _prevCollider;
         Collider2D _bulletCollider;
         float lifetime = 0f;
-        const float MOVE_SPEED = 100f;
+        const float MOVE_SPEED = 50f;
 
         #endregion
         #region MonoBehaviour
@@ -40,9 +40,6 @@ namespace LNS.Entities
             {
                 Kill();
             }
-
-            float angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
 
         #endregion
@@ -55,7 +52,9 @@ namespace LNS.Entities
             transform.position = position;
             lifetime = distance / MOVE_SPEED;
 
-            SetMoveDirection(aimDirection);
+
+            float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
             _rb.velocity = Vector2.zero;
             _rb.angularVelocity = 0f;
             _rb.AddForce(aimDirection.normalized * MOVE_SPEED, ForceMode2D.Impulse);
@@ -100,7 +99,6 @@ namespace LNS.Entities
         public override void OnCollision(Entity collider)
         {
             DealDamage(1, collider);
-            collider.Rb.AddForce(MoveDirection.normalized * 10f, ForceMode2D.Impulse);
             Kill();
         }
 
