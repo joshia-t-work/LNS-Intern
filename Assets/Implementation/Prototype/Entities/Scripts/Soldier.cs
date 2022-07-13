@@ -24,6 +24,9 @@ namespace LNS.Entities
         [SerializeField]
         protected Animator _feet;
 
+        [SerializeField]
+        protected float _respawnTime = 5f;
+
         SpriteRenderer _characterSprite;
         Collider2D[] _collider;
         public Collider2D[] Collider
@@ -35,9 +38,8 @@ namespace LNS.Entities
         {
             get { return _characterSprite.transform.right; }
         }
-        private RaycastHit2D _hit;
         protected const float GUNDISTANCE = 20f;
-        protected const float MELEEDISTANCE = 5f;
+        protected const float MELEEDISTANCE = 1.5f;
         protected bool _isGun = false;
         public bool IsReloaded
         {
@@ -55,6 +57,7 @@ namespace LNS.Entities
         public override void Awake()
         {
             base.Awake();
+            _targetAimDirection = _character.transform.right;
             _characterSprite = _character.GetComponent<SpriteRenderer>();
             Health.AddObserver((value) =>
             {
@@ -76,15 +79,6 @@ namespace LNS.Entities
             _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
              //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
             _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
-
-            Vector3 gunDir = _characterSprite.transform.right;
-            Vector3 gunPosition = _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + gunDir * 1.4f;
-            Vector3[] vector3s = new Vector3[] { gunPosition - gunDir * 0.2f, gunPosition + gunDir * GUNDISTANCE };
-            _hit = Physics2D.Raycast(gunPosition, gunDir, GUNDISTANCE);
-            if (_hit.collider != null)
-            {
-                vector3s[1] = _hit.point;
-            }
         }
         private void OnDrawGizmosSelected()
         {
@@ -161,7 +155,7 @@ namespace LNS.Entities
         }
         private void Melee()
         {
-            RaycastHit2D coll = Physics2D.BoxCast(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f);
+            RaycastHit2D coll = Physics2D.BoxCast(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, MELEEDISTANCE);
             if (coll.rigidbody != null)
             {
                 Damagable damagable = coll.rigidbody.GetComponent<Damagable>();

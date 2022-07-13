@@ -456,6 +456,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 6316548942562589792, guid: 9e2e40945ba42c849ba1e8964ff6807f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6316548942562589792, guid: 9e2e40945ba42c849ba1e8964ff6807f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6316548942562589792, guid: 9e2e40945ba42c849ba1e8964ff6807f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 180
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e2e40945ba42c849ba1e8964ff6807f, type: 3}
 --- !u!4 &272102821 stripped

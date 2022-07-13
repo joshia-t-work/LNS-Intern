@@ -23,11 +23,16 @@ namespace LNS.Entities
         [SerializeField]
         public Vector3[] PatrolPoints;
 
+        [SerializeField]
+        public float debugTest;
+
         Vector3 _spawnPosition;
         private int _patrolIndex = 0;
         private DirectionalAI _directionalAI;
         private Vector3 _targetPosition;
         private float _retargetTime;
+        private const float CONE_DETECTION_CONST = 0.75f;
+        private const float CONE_DETECTION_RANGE = 25f;
 
         #endregion
         #region MonoBehaviour
@@ -36,7 +41,6 @@ namespace LNS.Entities
         {
             base.Awake();
             _spawnPosition = transform.position;
-            _respawnTime = 3f;
             _directionalAI = GetComponent<DirectionalAI>();
         }
         public override void Update()
@@ -45,20 +49,11 @@ namespace LNS.Entities
             Vector3 newMoveDirection = Vector3.zero;
             _targetPosition = _spawnPosition;
             SetMoveDirection(Vector3.zero);
-            bool isPlayerVisible = false;
             Poolable[] players = InstancePool.GetInstances("Player");
+            bool isPlayerVisible = false;
             if (players.Length > 0)
             {
-                Vector3 playerAimDir = players[0].transform.position - transform.position;
-                RaycastHit2D hit = Physics2D.Raycast(transform.position + playerAimDir.normalized * 1.4f, playerAimDir, GUNDISTANCE);
-                if (hit.collider != null)
-                {
-                    Player player = hit.rigidbody.GetComponent<Player>();
-                    if (player != null)
-                    {
-                        isPlayerVisible = true;
-                    }
-                }
+                isPlayerVisible = CanSee(players[0]);
             }
             if (PatrolPoints.Length > 0)
             {
@@ -125,6 +120,48 @@ namespace LNS.Entities
                 SetAimDirection(newMoveDirection);
             }
             SetMoveDirection(newMoveDirection);
+        }
+        private void OnDrawGizmosSelected()
+        {
+            if (_character != null)
+            {
+                Quaternion rotationVector = Quaternion.Euler(0f, 0f, Mathf.Acos(CONE_DETECTION_CONST) * Mathf.Rad2Deg);
+                Vector3 left = rotationVector * _character.transform.right;
+                Vector3 right = Quaternion.Inverse(rotationVector) * _character.transform.right;
+                Gizmos.color = Color.gray;
+                Gizmos.DrawLine(_character.transform.position, _character.transform.position + left * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_character.transform.position, _character.transform.position + right * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_character.transform.position, _character.transform.position + _character.transform.right * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_character.transform.position + left * CONE_DETECTION_RANGE, _character.transform.position + _character.transform.right * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_character.transform.position + _character.transform.right * CONE_DETECTION_RANGE, _character.transform.position + right * CONE_DETECTION_RANGE);
+                //float count = 72;
+                //for (int i = 0; i < count; i++)
+                //{
+                //    Vector3 dir = new Vector3(Mathf.Cos(i * 2f * Mathf.PI / count), Mathf.Sin(i * 2f * Mathf.PI / count), 0f);
+                //    if (Vector3.Dot(_character.transform.right, dir) > debugTest)
+                //        Gizmos.DrawLine(transform.position, transform.position + dir * 3f);
+                //}
+            }
+        }
+
+        #endregion
+        #region Class Methods
+        
+        private bool CanSee(Poolable poolable)
+        {
+            Vector3 aimDir = poolable.transform.position - transform.position;
+            if (Vector3.Dot(_character.transform.right, aimDir) > CONE_DETECTION_CONST)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDir, CONE_DETECTION_RANGE);
+                if (hit.collider != null)
+                {
+                    if (poolable.transform == hit.transform)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion

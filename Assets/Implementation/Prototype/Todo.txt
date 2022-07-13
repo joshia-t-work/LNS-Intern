@@ -20,5 +20,9 @@ Additionals
 [Done] Add behaviour of enemy random shooting
 [Done] Add animations
 [Done] Change melee attack to boxcast
-[    ] Polish UI
+[Done] Polish UI
+
+[Done] Add tilemap
+[Done] Add enemy viewcone
+[    ] Add enemy backstab instakill mechanic
 [    ] Add dummy level

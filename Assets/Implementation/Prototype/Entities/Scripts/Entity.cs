@@ -8,6 +8,7 @@ namespace LNS.Entities
     /// <summary>
     /// A damagable entity that has movement and can collide
     /// </summary>
+    [SelectionBase]
     public abstract class Entity : Damagable
     {
         #region Variables
@@ -15,7 +16,6 @@ namespace LNS.Entities
         public Vector2 MoveDirection { get; private set; }
         protected Rigidbody2D _rb;
         public Rigidbody2D Rb { get { return _rb; } }
-        protected float _respawnTime = 5f;
         protected float _moveSpeed = 1f;
 
         #endregion
