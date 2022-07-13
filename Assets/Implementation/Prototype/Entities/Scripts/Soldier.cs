@@ -88,7 +88,10 @@ namespace LNS.Entities
         }
         private void OnDrawGizmosSelected()
         {
-            ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
+            if (_characterSprite != null)
+            {
+                ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
+            }
         }
 
         #endregion
