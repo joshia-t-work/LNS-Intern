@@ -13,7 +13,8 @@ namespace LNS.Entities
     {
         #region Variables
 
-        public Vector2 MoveDirection { get; private set; }
+        public Vector2 MoveDirection { get; protected set; }
+        public Vector2 AimDirection { get; protected set; }
         protected Rigidbody2D _rb;
         public Rigidbody2D Rb { get { return _rb; } }
         protected float _moveSpeed = 1f;

@@ -24,5 +24,5 @@ Additionals
 
 [Done] Add tilemap
 [Done] Add enemy viewcone
-[    ] Add enemy backstab instakill mechanic
+[Done] Add enemy backstab instakill mechanic
 [    ] Add dummy level

@@ -34,12 +34,9 @@ namespace LNS.Entities
             get { return _collider; }
         }
         private Vector2 _targetAimDirection = Vector2.zero;
-        public Vector2 AimDirection
-        {
-            get { return _characterSprite.transform.right; }
-        }
         protected const float GUNDISTANCE = 20f;
         protected const float MELEEDISTANCE = 1.5f;
+        protected const float BACKSTAB_DETECTION_CONST = 0.8f;
         protected bool _isGun = false;
         public bool IsReloaded
         {
@@ -77,6 +74,7 @@ namespace LNS.Entities
 
             float angle = Mathf.Atan2(_targetAimDirection.y, _targetAimDirection.x) * Mathf.Rad2Deg;
             _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
+            AimDirection = _characterSprite.transform.right;
              //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
             _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
         }
@@ -161,7 +159,20 @@ namespace LNS.Entities
                 Damagable damagable = coll.rigidbody.GetComponent<Damagable>();
                 if (damagable != null)
                 {
-                    DealDamage(1, damagable);
+                    Entity entity = (Entity)damagable;
+                    if (entity != null)
+                    {
+                        if (Vector3.Dot(AimDirection, entity.AimDirection) > BACKSTAB_DETECTION_CONST)
+                        {
+                            DealDamage(3, damagable);
+                        } else
+                        {
+                            DealDamage(1, damagable);
+                        }
+                    } else
+                    {
+                        DealDamage(1, damagable);
+                    }
                 }
             }
         }
