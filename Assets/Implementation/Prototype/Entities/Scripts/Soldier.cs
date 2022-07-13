@@ -74,6 +74,8 @@ namespace LNS.Entities
 
             float angle = Mathf.Atan2(_targetAimDirection.y, _targetAimDirection.x) * Mathf.Rad2Deg;
             _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
+             //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
+            _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
 
             Vector3 gunDir = _characterSprite.transform.right;
             Vector3 gunPosition = _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + gunDir * 1.4f;
@@ -94,8 +96,12 @@ namespace LNS.Entities
 
         private void UpdateAnimators()
         {
-            _character.SetFloat("Speed", Rb.velocity.magnitude / (_moveSpeed * 5f));
+            float speed = Rb.velocity.magnitude / (_moveSpeed * 5f);
+            _character.SetFloat("Speed", speed);
             _character.SetBool("IsGun", _isGun);
+            _feet.SetFloat("Speed", speed);
+            _feet.SetFloat("SpeedMultiplier", speed + 1f);
+            _feet.SetFloat("Strafe", Vector3.Dot(Rb.velocity.normalized, _characterSprite.transform.up * -1) / 2f + 0.5f);
         }
         public void SetAimDirection(Vector2 dir)
         {
