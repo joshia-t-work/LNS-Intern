@@ -160,6 +160,7 @@ namespace LNS.Entities
                 if (damagable != null)
                 {
                     Entity entity = (Entity)damagable;
+                    entity.Rb.AddForce(AimDirection.normalized * 10f, ForceMode2D.Impulse);
                     if (entity != null)
                     {
                         if (Vector3.Dot(AimDirection, entity.AimDirection) > BACKSTAB_DETECTION_CONST)

@@ -115,12 +115,12 @@ MonoBehaviour:
   _healthbar: {fileID: 6316548940841419516}
   _character: {fileID: 1197966896947634777}
   _feet: {fileID: 8687157860366139059}
-  _meleeSprite: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
-  _gunSprite: {fileID: 21300000, guid: 81bee05057191784fb9dcdfc56717ba1, type: 3}
+  _respawnTime: 3
   _canShoot: 0
   _targetsPlayer: 0
   _runOnSight: 0
   PatrolPoints: []
+  debugTest: 0
 --- !u!114 &4920351679932240061
 MonoBehaviour:
   m_ObjectHideFlags: 0

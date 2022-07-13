@@ -18,6 +18,9 @@ namespace LNS.Entities
         protected Rigidbody2D _rb;
         public Rigidbody2D Rb { get { return _rb; } }
         protected float _moveSpeed = 1f;
+        private Vector2 _previousVel;
+        private float _previousAngVel;
+        private Vector3 _previousPos;
 
         #endregion
         #region MonoBehaviour
@@ -32,6 +35,9 @@ namespace LNS.Entities
             {
                 _rb.AddForce(MoveDirection.normalized * _moveSpeed, ForceMode2D.Impulse);
             }
+            _previousVel = _rb.velocity;
+            _previousAngVel = _rb.angularVelocity;
+            _previousPos = _rb.position;
         }
         private void OnCollisionEnter2D(Collision2D collision)
         {
@@ -63,6 +69,16 @@ namespace LNS.Entities
         public virtual void OnCollision(Entity collider)
         {
 
+        }
+
+        /// <summary>
+        /// Sets velocity and position back to state before collision
+        /// </summary>
+        public void PreventCollision()
+        {
+            _rb.velocity = _previousVel;
+            _rb.angularVelocity = _previousAngVel;
+            transform.position = _previousPos + (Vector3)_rb.velocity * Time.deltaTime;
         }
 
         #endregion

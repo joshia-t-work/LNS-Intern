@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LNS.Entities
 {
-    public class Enemy : Soldier
+    public class DummyEnemy : Soldier
     {
         #region Variables
 
@@ -22,9 +22,6 @@ namespace LNS.Entities
 
         [SerializeField]
         public Vector3[] PatrolPoints;
-
-        [SerializeField]
-        public float debugTest;
 
         Vector3 _spawnPosition;
         private int _patrolIndex = 0;
@@ -70,7 +67,7 @@ namespace LNS.Entities
                 {
                     if (isPlayerVisible)
                     {
-                        Vector2 aimDirection = InstancePool.GetInstances("Player")[0].transform.position - transform.position;
+                        Vector2 aimDirection = players[0].transform.position - transform.position;
                         SetAimDirection(aimDirection);
                         if (IsReloaded)
                         {
@@ -102,7 +99,8 @@ namespace LNS.Entities
                     {
                         newMoveDirection = transform.position - players[0].transform.position;
                         _targetPosition = transform.position + newMoveDirection.normalized;
-                        SetAimDirection(players[0].transform.position - transform.position);
+                        Vector2 aimDirection = players[0].transform.position - transform.position;
+                        SetAimDirection(aimDirection);
                     }
                 } else
                 {
@@ -115,7 +113,7 @@ namespace LNS.Entities
                 }
             }
             newMoveDirection = _directionalAI.EvaluateDirectionToTarget(transform.position, _targetPosition, newMoveDirection.normalized);
-            if (!_canShoot)
+            if (!_canShoot && !_runOnSight)
             {
                 SetAimDirection(newMoveDirection);
             }
