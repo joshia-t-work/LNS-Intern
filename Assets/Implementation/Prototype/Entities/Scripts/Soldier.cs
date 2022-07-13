@@ -84,6 +84,10 @@ namespace LNS.Entities
                 vector3s[1] = _hit.point;
             }
         }
+        private void OnDrawGizmosSelected()
+        {
+            ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
+        }
 
         #endregion
         #region Class Methods
@@ -146,21 +150,15 @@ namespace LNS.Entities
             //    }
             //}
         }
-        private void OnDrawGizmos()
-        {
-            Gizmos.DrawCube()
-        }
         private void Melee()
         {
-            if (_hit.rigidbody != null)
+            RaycastHit2D coll = Physics2D.BoxCast(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f);
+            if (coll.rigidbody != null)
             {
-                if (Vector3.Distance(transform.position, _hit.point) < MELEEDISTANCE)
+                Damagable damagable = coll.rigidbody.GetComponent<Damagable>();
+                if (damagable != null)
                 {
-                    Damagable damagable = _hit.rigidbody.GetComponent<Damagable>();
-                    if (damagable != null)
-                    {
-                        DealDamage(1, damagable);
-                    }
+                    DealDamage(1, damagable);
                 }
             }
         }

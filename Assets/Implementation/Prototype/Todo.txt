@@ -18,7 +18,7 @@ Additionals
 [Done] Reduce bullet spread
 [Done] Fix point to direction not working on up and down
 [Done] Add behaviour of enemy random shooting
-[    ] Add animations
-[    ] Change melee attack to boxcast
+[Done] Add animations
+[Done] Change melee attack to boxcast
 [    ] Polish UI
 [    ] Add dummy level
