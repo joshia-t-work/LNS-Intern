@@ -15,6 +15,9 @@ namespace LNS.Entities
         bool _canShoot;
 
         [SerializeField]
+        bool _targetsPlayer;
+
+        [SerializeField]
         bool _runOnSight;
 
         [SerializeField]
@@ -24,6 +27,7 @@ namespace LNS.Entities
         private int _patrolIndex = 0;
         private DirectionalAI _directionalAI;
         private Vector3 _targetPosition;
+        private float _retargetTime;
 
         #endregion
         #region MonoBehaviour
@@ -65,14 +69,32 @@ namespace LNS.Entities
                 _targetPosition = PatrolPoints[_patrolIndex];
                 newMoveDirection = PatrolPoints[_patrolIndex] - transform.position;
             }
-            if (isPlayerVisible)
+            if (_canShoot)
             {
-                if (_canShoot)
+                if (_targetsPlayer)
                 {
-                    if (IsReloaded)
+                    if (isPlayerVisible)
                     {
                         Vector2 aimDirection = InstancePool.GetInstances("Player")[0].transform.position - transform.position;
                         SetAimDirection(aimDirection);
+                        if (IsReloaded)
+                        {
+                            Attack();
+                        }
+                    }
+                }
+                else
+                {
+                    if (_retargetTime < 0f)
+                    {
+                        SetAimDirection(Random.insideUnitCircle);
+                        _retargetTime = 1f;
+                    } else
+                    {
+                        _retargetTime -= Time.deltaTime;
+                    }
+                    if (IsReloaded)
+                    {
                         Attack();
                     }
                 }
