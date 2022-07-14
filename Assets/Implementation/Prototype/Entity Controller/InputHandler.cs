@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace LNS.InputController
+namespace LNS.Entities
 {
     public class InputHandler : MonoBehaviour
     {

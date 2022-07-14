@@ -27,17 +27,24 @@ namespace LNS.Entities
         [SerializeField]
         protected float _respawnTime = 5f;
 
+        [SerializeField]
+        protected bool _startsWithGun = false;
+
         SpriteRenderer _characterSprite;
         Collider2D[] _collider;
         public Collider2D[] Collider
         {
             get { return _collider; }
         }
+        public Vector2 TargetAimDirection { get { return _targetAimDirection; } }
         private Vector2 _targetAimDirection = Vector2.zero;
         protected const float GUNDISTANCE = 20f;
         protected const float MELEEDISTANCE = 1.5f;
         protected const float BACKSTAB_DETECTION_CONST = 0.8f;
-        protected bool _isGun = false;
+        public Vector3 SpawnPosition { get { return _spawnPosition; } }
+        protected Vector3 _spawnPosition;
+        private bool _isGun = false;
+
         public bool IsReloaded
         {
             get
@@ -54,6 +61,7 @@ namespace LNS.Entities
         public override void Awake()
         {
             base.Awake();
+            _spawnPosition = transform.position;
             _targetAimDirection = _character.transform.right;
             _characterSprite = _character.GetComponent<SpriteRenderer>();
             Health.AddObserver((value) =>
@@ -61,8 +69,7 @@ namespace LNS.Entities
                 _healthbar.value = (float)value / MaxHealth.Value;
             });
             _collider = GetComponentsInChildren<Collider2D>();
-            _isGun = false;
-            SwitchStance();
+            SetStance(_startsWithGun);
         }
         public virtual void Update()
         {
@@ -78,8 +85,14 @@ namespace LNS.Entities
              //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
             _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
         }
+
+        #endregion
+        #region Debugging
+
         private void OnDrawGizmosSelected()
         {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)_targetAimDirection);
             if (_characterSprite != null)
             {
                 ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
@@ -104,6 +117,11 @@ namespace LNS.Entities
         }
         public void Attack()
         {
+            IEnumerator DelayedMethod(float time, System.Action action)
+            {
+                yield return new WaitForSeconds(time);
+                action();
+            }
             if (IsReloaded)
             {
                 _character.SetFloat("ReloadSpeed", 1.25f / ATTACK_COOLDOWN);
@@ -120,14 +138,9 @@ namespace LNS.Entities
                 }
             }
         }
-        IEnumerator DelayedMethod(float time, System.Action action)
+        public void SetStance(bool _isGun)
         {
-            yield return new WaitForSeconds(time);
-            action();
-        }
-        public void SwitchStance()
-        {
-            _isGun = !_isGun;
+            this._isGun = _isGun;
             if (_isGun)
             {
                 _moveSpeed = 1.5f;
@@ -136,6 +149,11 @@ namespace LNS.Entities
             {
                 _moveSpeed = 2f;
             }
+        }
+        public void SwitchStance()
+        {
+            _isGun = !_isGun;
+            SetStance(_isGun);
         }
         private void Fire()
         {
@@ -200,7 +218,7 @@ namespace LNS.Entities
         /// </summary>
         public virtual void OnRespawn()
         {
-
+            transform.position = _spawnPosition;
         }
 
         #endregion

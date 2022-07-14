@@ -25,4 +25,6 @@ Additionals
 [Done] Add tilemap
 [Done] Add enemy viewcone
 [Done] Add enemy backstab instakill mechanic
+[Work] Split AIEnemy, DummyEnemy into AI and Soldier component
+[    ] Make more advanced AI
 [    ] Add dummy level

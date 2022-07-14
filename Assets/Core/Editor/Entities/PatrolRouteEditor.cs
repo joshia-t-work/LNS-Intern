@@ -2,12 +2,12 @@ using LNS.Entities;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(DummyEnemy)), CanEditMultipleObjects]
+[CustomEditor(typeof(BaseSoldierAI), true), CanEditMultipleObjects]
 public class PatrolRouteEditor : Editor
 {
     protected virtual void OnSceneGUI()
     {
-        DummyEnemy enemy = (DummyEnemy)target;
+        BaseSoldierAI enemy = (BaseSoldierAI)target;
 
         for (int i = 0; i < enemy.PatrolPoints.Length; i++)
         {

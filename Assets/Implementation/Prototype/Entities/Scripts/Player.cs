@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace LNS.Entities
 {
+    /// <summary>
+    /// A special type of soldier that owns its own following camera
+    /// </summary>
     public class Player : Soldier
     {
         [Header("Player")]
@@ -14,7 +17,6 @@ namespace LNS.Entities
         {
             base.Awake();
             _cam.SetTarget(transform);
-            SwitchStance();
         }
         public override void OnKilledBy(Damagable other)
         {
@@ -25,7 +27,6 @@ namespace LNS.Entities
         {
             base.OnRespawn();
             _cam.SetTarget(transform);
-            transform.position = Vector3.zero;
         }
     }
 }

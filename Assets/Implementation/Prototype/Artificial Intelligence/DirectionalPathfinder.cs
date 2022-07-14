@@ -1,22 +1,21 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LNS.Entities
+namespace LNS.AI
 {
-    public class DirectionalAI : MonoBehaviour
+    public class DirectionalPathfinder
     {
+        #region Variables
+
         public enum Behaviours
         {
             KeepDistance,
             Stop
         }
-        public Behaviours BehaviourOnTargetReach;
-        public float CollisionDetectionRange = 2f;
-        [Tooltip("How much the object avoids collision, 1 means total stop upon detecting collider")]
-        public float CollisionDetectionSensitivity = 0.3f;
-        [Tooltip("Maintain this amount of distance from target")]
-        public float KeepDistance;
+        private Behaviours _behaviourOnTargetReach;
+        private float _collisionDetectionRange = 2f;
+        private float _collisionDetectionSensitivity = 0.3f;
 
         //List<Consideration> considerations = new List<Consideration>();
         List<Vector3> _considerationDirections = new List<Vector3>();
@@ -30,19 +29,28 @@ namespace LNS.Entities
 
         private float keepDistanceSq;
 
-        //Rigidbody2D rb;
+        #endregion
 
-        #region MonoBehaviour
+        #region Constructor
 
-        private void Awake()
+        /// <summary>
+        /// Creates a new DirectionalAI
+        /// </summary>
+        /// <param name="behaviour">Whether returns a direction on reaching target to maintain distance or Vector.zero</param>
+        /// <param name="collisionDetectionRange">Distance a collider is detected</param>
+        /// <param name="collisionDetectionSensitivity">How much the object avoids collision, 1 means total stop upon detecting collider</param>
+        /// <param name="keepDistance">Maintain this amount of distance from target</param>
+        public DirectionalPathfinder(Behaviours behaviour, float collisionDetectionRange, float collisionDetectionSensitivity, float keepDistance)
         {
-            //rb = GetComponent<Rigidbody2D>();
-            keepDistanceSq = KeepDistance * KeepDistance;
+            _behaviourOnTargetReach = behaviour;
+            _collisionDetectionRange = collisionDetectionRange;
+            _collisionDetectionSensitivity = collisionDetectionSensitivity;
+            keepDistanceSq = keepDistance * keepDistance;
 
             _interest = new Vector3[_interestCount];
             _fixedConsiderationDirections = new Vector3[_interestCount + 2];
             _fixedConsiderationDesirability = new float[_interestCount + 2];
-            _fixedConsiderationDesirability[0] = 1f;
+            _fixedConsiderationDesirability[0] = 0.5f;
             for (int i = 0; i < _interestCount; i++)
             {
                 _interest[i] = new Vector3(Mathf.Cos((float)i / _interestCount * Mathf.PI * 2), Mathf.Sin((float)i / _interestCount * Mathf.PI * 2), 0);
@@ -68,18 +76,18 @@ namespace LNS.Entities
             targetVec = (_targetPosition - fromPosition);
             float distSq = Vector3.SqrMagnitude(targetVec);
             targetVec = targetVec.normalized;
-            switch (BehaviourOnTargetReach)
+            switch (_behaviourOnTargetReach)
             {
                 case Behaviours.KeepDistance:
                     if (distSq < keepDistanceSq)
                     {
-                        _fixedConsiderationDirections[1] = targetVec * (distSq / (keepDistanceSq / 2f) - 1f);
-                        _fixedConsiderationDesirability[1] = Mathf.Abs(0.5f - distSq / keepDistanceSq);
+                        _fixedConsiderationDirections[1] = targetVec * (2f * distSq / keepDistanceSq - 1f);
+                        _fixedConsiderationDesirability[1] = Mathf.Abs(distSq / keepDistanceSq);
                     }
                     else
                     {
                         _fixedConsiderationDirections[1] = targetVec;
-                        _fixedConsiderationDesirability[1] = 0.5f;
+                        _fixedConsiderationDesirability[1] = 1f;
                     }
                     break;
                 case Behaviours.Stop:
@@ -90,7 +98,7 @@ namespace LNS.Entities
                     else
                     {
                         _fixedConsiderationDirections[1] = targetVec;
-                        _fixedConsiderationDesirability[1] = 0.5f;
+                        _fixedConsiderationDesirability[1] = 1f;
                     }
                     break;
                 default:
@@ -105,7 +113,7 @@ namespace LNS.Entities
 
             for (int i = 0; i < _interestCount; i++)
             {
-                _fixedConsiderationDesirability[2 + i] = CollisionDetectionSensitivity;
+                _fixedConsiderationDesirability[2 + i] = _collisionDetectionSensitivity;
             }
             for (int i = 0; i < _interestCount; i++)
             {
@@ -122,10 +130,10 @@ namespace LNS.Entities
                 //    interestMultiplier[i] = 0;
                 //    break;
                 //}
-                RaycastHit2D hit = Physics2D.Raycast(fromPosition, _interest[i], CollisionDetectionRange);
+                RaycastHit2D hit = Physics2D.Raycast(fromPosition, _interest[i], _collisionDetectionRange);
                 if (hit.collider != null)
                 {
-                    _fixedConsiderationDesirability[2 + i] = CollisionDetectionSensitivity;
+                    _fixedConsiderationDesirability[2 + i] = _collisionDetectionSensitivity;
                     _interestMultiplier[i] = 0;
                 }
             }
@@ -187,7 +195,7 @@ namespace LNS.Entities
         #endregion
         #region Debugging
 
-        private void OnDrawGizmosSelected()
+        public void DebugGizmos(Transform transform)
         {
             if (_interestMultiplier.Length > 0)
             {
@@ -208,6 +216,20 @@ namespace LNS.Entities
                     }
                     Gizmos.DrawSphere(transform.position + _considerationDirections[i] * 1.1f * _considerationDesirability[i], 0.05f);
                 }
+
+                for (int i = 0; i < _fixedConsiderationDirections.Length; i++)
+                {
+                    if (_fixedConsiderationDesirability[i] < 0)
+                    {
+                        Gizmos.color = Color.red;
+                    }
+                    else
+                    {
+                        Gizmos.color = Color.green;
+                    }
+                    Gizmos.DrawSphere(transform.position + _fixedConsiderationDirections[i] * 1.1f * _fixedConsiderationDesirability[i], 0.05f);
+                }
+
                 int maxInterest = 0;
                 for (int i = 0; i < _interest.Length; i++)
                 {

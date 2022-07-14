@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2252984794623588692
+--- !u!114 &1521827062471791905
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -108,7 +108,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 6316548942328300694}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e6c501b81a63d478b9c66f4e423688, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a21517614830d442a3594ce951679a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soldier: {fileID: 4271013776812903343}
+  _canShoot: 0
+  _targetsPlayer: 0
+  _runOnSight: 0
+  PatrolPoints: []
+--- !u!114 &4271013776812903343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6316548942328300694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50845fccf8828344ebb763162ab5898c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   poolableType: {fileID: 11400000, guid: 8f5b39209e948d340a6072402d0fd237, type: 2}
@@ -116,24 +133,4 @@ MonoBehaviour:
   _character: {fileID: 1197966896947634777}
   _feet: {fileID: 8687157860366139059}
   _respawnTime: 3
-  _canShoot: 0
-  _targetsPlayer: 0
-  _runOnSight: 0
-  PatrolPoints: []
-  debugTest: 0
---- !u!114 &4920351679932240061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6316548942328300694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b64db62759d4ead4184b2261748b9da9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BehaviourOnTargetReach: 1
-  CollisionDetectionRange: 2
-  CollisionDetectionSensitivity: 0.5
-  KeepDistance: 0.5
+  _startsWithGun: 1
