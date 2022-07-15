@@ -22,23 +22,21 @@ namespace LNS.Entities
         public Vector3[] PatrolPoints;
 
         [SerializeField]
-        private FireBehaviour _aimBehaviour;
+        private AimBehaviour _aimBehaviour;
 
         [SerializeField]
         private string _targetType;
 
-        public enum FireBehaviour
+        public enum AimBehaviour
         {
-            Hold,
-            AlwaysFire,
+            DoNotAim,
+            AimForwards,
             FireAtWill,
-            FireOnCommand,
         }
 
-        private Vector3 _targetPosition;
         private float _randomRetargetTime;
 
-        protected DirectionalPathfinder _pathfinder = new DirectionalPathfinder(DirectionalPathfinder.Behaviours.KeepDistance, 2f, 0.5f, 15f);
+        protected DirectionalPathfinder _pathfinder = new DirectionalPathfinder(DirectionalPathfinder.Behaviours.Stop, 1.5f, 0.5f, 0.5f);
         protected const float CONE_DETECTION_CONST = 0.75f;
         protected const float CONE_DETECTION_RANGE = 25f;
         protected const float REACH_POINT_DISTANCE = 1f;
@@ -49,6 +47,10 @@ namespace LNS.Entities
         #endregion
         #region MonoBehaviour
 
+        public virtual void Awake()
+        {
+            _soldier.SetAimDirection(_soldier.AimDirection);
+        }
         public virtual void Update()
         {
             // If it does not target anything, aim into a random direction
@@ -66,7 +68,10 @@ namespace LNS.Entities
             {
                 Poolable[] targets = InstancePool.GetInstances(_targetType);
                 _isTargetVisible = false;
-                aimDirection = _soldier.MoveDirection;
+                if (_soldier.MoveDirection != Vector2.zero)
+                {
+                    aimDirection = _soldier.MoveDirection;
+                }
                 if (targets.Length > 0)
                 {
                     _target = targets[0];
@@ -74,6 +79,13 @@ namespace LNS.Entities
                     if (_isTargetVisible)
                     {
                         aimDirection = targets[0].transform.position - transform.position;
+                        // prediction
+                        Entity entity = (Entity)targets[0];
+                        if (entity != null)
+                        {
+                            Vector3 predictedMove = Random.Range(1f, 2f) * entity.Rb.velocity * (aimDirection.magnitude / Bullet.MOVE_SPEED);
+                            aimDirection = targets[0].transform.position + predictedMove - transform.position;
+                        }
                     }
                 }
             }
@@ -83,37 +95,24 @@ namespace LNS.Entities
             {
                 switch (_aimBehaviour)
                 {
-                    case FireBehaviour.Hold:
-                        if (!_isTargetVisible)
-                        {
-                            aimDirection = _soldier.MoveDirection;
-                        }
+                    case AimBehaviour.DoNotAim:
+                        aimDirection = _soldier.TargetAimDirection;
                         break;
-                    case FireBehaviour.AlwaysFire:
-                        //if (Time.time - _randomRetargetTime > RANDOM_RETARGET_TIME)
-                        //{
-                        //    _soldier.SetAimDirection(Random.insideUnitCircle);
-                        //    _randomRetargetTime = Time.time;
-                        //}
+                    case AimBehaviour.AimForwards:
+                        aimDirection = _soldier.MoveDirection;
+                        break;
+                    case AimBehaviour.FireAtWill:
                         if (_soldier.IsReloaded)
                         {
                             _soldier.Attack();
                         }
-                        break;
-                    case FireBehaviour.FireAtWill:
-                        if (_soldier.IsReloaded)
-                        {
-                            _soldier.Attack();
-                        }
-                        break;
-                    case FireBehaviour.FireOnCommand:
                         break;
                     default:
                         break;
                 }
             }
             _soldier.SetAimDirection(aimDirection);
-            _soldier.SetMoveDirection(_pathfinder.EvaluateDirectionToTarget(transform.position, _targetPosition, _soldier.MoveDirection.normalized));
+            _soldier.SetMoveDirection(_pathfinder.EvaluateDirectionToTarget(transform.position));
         }
 
         #endregion
@@ -140,10 +139,6 @@ namespace LNS.Entities
         #endregion
         #region Class Methods
 
-        protected void SetTargetPosition(Vector3 position)
-        {
-            _targetPosition = position;
-        }
         protected bool CanSee(Poolable poolable)
         {
             Vector3 aimDir = poolable.transform.position - _soldier.transform.position;

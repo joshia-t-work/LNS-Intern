@@ -23,11 +23,6 @@ namespace LNS.Entities
         #endregion
         #region MonoBehaviour
 
-        public virtual void Awake()
-        {
-            _pathfinder = new DirectionalPathfinder(DirectionalPathfinder.Behaviours.Stop, 2f, 0.5f, 0.5f);
-        }
-
         public override void Update()
         {
             Vector3 _targetPosition = _soldier.SpawnPosition;
@@ -43,13 +38,10 @@ namespace LNS.Entities
             {
                 if (_isTargetVisible)
                 {
+                    _targetPosition = transform.position;
                     if (Vector3.Distance(transform.position, _target.transform.position) < 10f)
                     {
-                        Vector2 aimDirection = _target.transform.position - transform.position;
-                        _targetPosition = transform.position - (Vector3)aimDirection.normalized;
-                    } else
-                    {
-                        _targetPosition = transform.position;
+                        _pathfinder.AddKeepDistanceConsideration((_target.transform.position - transform.position).normalized, 1f, 10f);
                     }
                 }
                 else
@@ -60,7 +52,11 @@ namespace LNS.Entities
                     }
                 }
             }
-            SetTargetPosition(_targetPosition);
+            if (Vector2.Distance(transform.position, _targetPosition) > REACH_POINT_DISTANCE)
+            {
+                _pathfinder.AddConsideration((_targetPosition - transform.position).normalized, 1f);
+                _pathfinder.AddConsideration(_soldier.MoveDirection.normalized, 0.5f);
+            }
             base.Update();
         }
 

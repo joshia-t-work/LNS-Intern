@@ -22,7 +22,7 @@ namespace LNS.Entities
         Collider2D[] _prevCollider;
         Collider2D _bulletCollider;
         float lifetime = 0f;
-        const float MOVE_SPEED = 100f;
+        public const float MOVE_SPEED = 100f;
 
         #endregion
         #region MonoBehaviour

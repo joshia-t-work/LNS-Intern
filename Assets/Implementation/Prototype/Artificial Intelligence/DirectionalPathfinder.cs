@@ -18,6 +18,8 @@ namespace LNS.AI
         private float _collisionDetectionSensitivity = 0.3f;
 
         //List<Consideration> considerations = new List<Consideration>();
+        Vector3[] _gizmosConsiderationDirections = new Vector3[0];
+        float[] _gizmosConsiderationDesirability = new float[0];
         List<Vector3> _considerationDirections = new List<Vector3>();
         List<float> _considerationDesirability = new List<float>();
         Vector3[] _fixedConsiderationDirections = new Vector3[0];
@@ -26,8 +28,9 @@ namespace LNS.AI
         Vector3[] _interest = new Vector3[0];
         float[] _interestMultiplier = new float[0];
         Vector3 _targetPosition;
+        Vector3 _targetVec;
 
-        private float keepDistanceSq;
+        private float _keepDistance;
 
         #endregion
 
@@ -45,24 +48,32 @@ namespace LNS.AI
             _behaviourOnTargetReach = behaviour;
             _collisionDetectionRange = collisionDetectionRange;
             _collisionDetectionSensitivity = collisionDetectionSensitivity;
-            keepDistanceSq = keepDistance * keepDistance;
+            _keepDistance = keepDistance;
 
             _interest = new Vector3[_interestCount];
-            _fixedConsiderationDirections = new Vector3[_interestCount + 2];
-            _fixedConsiderationDesirability = new float[_interestCount + 2];
-            _fixedConsiderationDesirability[0] = 0.5f;
+            _fixedConsiderationDirections = new Vector3[_interestCount];
+            _fixedConsiderationDesirability = new float[_interestCount];
             for (int i = 0; i < _interestCount; i++)
             {
                 _interest[i] = new Vector3(Mathf.Cos((float)i / _interestCount * Mathf.PI * 2), Mathf.Sin((float)i / _interestCount * Mathf.PI * 2), 0);
-                _fixedConsiderationDirections[2 + i] = -_interest[i];
+                _fixedConsiderationDirections[i] = -_interest[i];
             }
         }
 
         #endregion
         #region Class Methods
 
+        public void SetBehaviour(Behaviours behaviour)
+        {
+            _behaviourOnTargetReach = behaviour;
+        }
+        public void SetKeepDistance(float keepDistance)
+        {
+            _keepDistance = keepDistance;
+        }
+
         /// <summary>
-        /// Returns normalized evaluated direction.
+        /// Returns normalized evaluated direction. Adding current movement direction as consideration.
         /// </summary>
         /// <param name="targetPosition">Position to move to</param>
         /// <param name="movedir">Current normalized movement direction</param>
@@ -70,39 +81,51 @@ namespace LNS.AI
         public Vector3 EvaluateDirectionToTarget(Vector3 fromPosition, Vector3 targetPosition, Vector3 movedir)
         {
             _targetPosition = targetPosition;
-            _fixedConsiderationDirections[0] = movedir;
+            AddConsideration(movedir, 0.5f);
 
-            Vector3 targetVec;
-            targetVec = (_targetPosition - fromPosition);
-            float distSq = Vector3.SqrMagnitude(targetVec);
-            targetVec = targetVec.normalized;
+            _targetVec = (_targetPosition - fromPosition);
+            float dist = _targetVec.magnitude;
+            _targetVec = _targetVec.normalized;
             switch (_behaviourOnTargetReach)
             {
                 case Behaviours.KeepDistance:
-                    if (distSq < keepDistanceSq)
-                    {
-                        _fixedConsiderationDirections[1] = targetVec * (2f * distSq / keepDistanceSq - 1f);
-                        _fixedConsiderationDesirability[1] = Mathf.Abs(distSq / keepDistanceSq);
-                    }
-                    else
-                    {
-                        _fixedConsiderationDirections[1] = targetVec;
-                        _fixedConsiderationDesirability[1] = 1f;
-                    }
+                    AddKeepDistanceConsideration(_targetVec, 1f, _keepDistance);
                     break;
                 case Behaviours.Stop:
-                    if (distSq < keepDistanceSq)
+                    if (dist < _keepDistance)
                     {
+                        ClearConsiderations();
                         return Vector3.zero;
                     }
                     else
                     {
-                        _fixedConsiderationDirections[1] = targetVec;
-                        _fixedConsiderationDesirability[1] = 1f;
+                        AddConsideration(_targetVec, 1f);
                     }
                     break;
-                default:
-                    break;
+            }
+
+            return evaluateDirectionToTarget(fromPosition);
+        }
+
+        /// <summary>
+        /// Returns normalized evaluated direction.
+        /// </summary>
+        /// <returns></returns>
+        public Vector3 EvaluateDirectionToTarget(Vector3 fromPosition)
+        {
+            return evaluateDirectionToTarget(fromPosition);
+        }
+
+        /// <summary>
+        /// Returns normalized evaluated direction.
+        /// </summary>
+        /// <param name="targetPosition">Position to move to</param>
+        /// <returns></returns>
+        private Vector3 evaluateDirectionToTarget(Vector3 fromPosition)
+        {
+            if (_considerationDesirability.Count == 0)
+            {
+                return Vector3.zero;
             }
 
             _interestMultiplier = new float[_interestCount];
@@ -113,11 +136,7 @@ namespace LNS.AI
 
             for (int i = 0; i < _interestCount; i++)
             {
-                _fixedConsiderationDesirability[2 + i] = _collisionDetectionSensitivity;
-            }
-            for (int i = 0; i < _interestCount; i++)
-            {
-                _fixedConsiderationDesirability[2 + i] = 0f;
+                _fixedConsiderationDesirability[i] = 0f;
                 //RaycastHit2D[] hits = Physics2D.RaycastAll(fromPosition, interest[i], collisionDetectionRange);
                 //for (int j = 0; j < hits.Length; j++)
                 //{
@@ -133,29 +152,30 @@ namespace LNS.AI
                 RaycastHit2D hit = Physics2D.Raycast(fromPosition, _interest[i], _collisionDetectionRange);
                 if (hit.collider != null)
                 {
-                    _fixedConsiderationDesirability[2 + i] = _collisionDetectionSensitivity;
+                    _fixedConsiderationDesirability[i] = _collisionDetectionSensitivity;
                     _interestMultiplier[i] = 0;
                 }
             }
 
-            for (int i = 0; i < _interestCount + 2; i++)
+            Vector2 currentVec;
+            for (int i = 0; i < _interestCount; i++)
             {
                 if (_fixedConsiderationDesirability[i] == 0)
                 {
                     continue;
                 }
-                targetVec = _fixedConsiderationDirections[i];
+                currentVec = _fixedConsiderationDirections[i];
                 for (int ii = 0; ii < _interestCount; ii++)
                 {
-                    _interestMultiplier[ii] *= 1f + _fixedConsiderationDesirability[i] * (Vector3.Dot(_interest[ii], targetVec) / 2f - 0.5f);
+                    _interestMultiplier[ii] *= 1f + _fixedConsiderationDesirability[i] * (Vector3.Dot(_interest[ii], currentVec) / 2f - 0.5f);
                 }
             }
             for (int i = 0; i < _considerationDirections.Count; i++)
             {
-                targetVec = _considerationDirections[i];
+                currentVec = _considerationDirections[i];
                 for (int ii = 0; ii < _interestCount; ii++)
                 {
-                    _interestMultiplier[ii] *= 1f + _considerationDesirability[i] * (Vector3.Dot(_interest[ii], targetVec) / 2f - 0.5f);
+                    _interestMultiplier[ii] *= 1f + _considerationDesirability[i] * (Vector3.Dot(_interest[ii], currentVec) / 2f - 0.5f);
                 }
             }
 
@@ -167,6 +187,8 @@ namespace LNS.AI
                     maxInterest = i;
                 }
             }
+            _gizmosConsiderationDirections = _considerationDirections.ToArray();
+            _gizmosConsiderationDesirability = _considerationDesirability.ToArray();
             ClearConsiderations();
             return _interest[maxInterest];
         }
@@ -175,6 +197,31 @@ namespace LNS.AI
         {
             _considerationDirections.Clear();
             _considerationDesirability.Clear();
+        }
+
+        /// <summary>
+        /// Add a consideration vector with decreasing desiribility the closer it is
+        /// </summary>
+        /// <param name="direction">Direction towards target position, do NOT normalize</param>
+        /// <param name="desiribility">Amount of desire to move towards</param>
+        public void AddKeepDistanceConsideration(Vector3 direction, float desiribility, float distance)
+        {
+            if (desiribility == 0)
+            {
+                return;
+            }
+            float distSq = direction.sqrMagnitude;
+            float keepDistSq = distance * distance * 1f;
+            if (distSq < keepDistSq)
+            {
+                _considerationDirections.Add(direction.normalized * (2f * distSq / keepDistSq - 1f));
+                _considerationDesirability.Add(Mathf.Abs(0.5f - distSq / keepDistSq) * desiribility);
+            }
+            else
+            {
+                _considerationDirections.Add(direction.normalized);
+                _considerationDesirability.Add(desiribility);
+            }
         }
 
         /// <summary>
@@ -199,14 +246,11 @@ namespace LNS.AI
         {
             if (_interestMultiplier.Length > 0)
             {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawSphere(_targetPosition, 0.1f);
-                Gizmos.DrawLine(transform.position + (_targetPosition - transform.position).normalized, _targetPosition);
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(transform.position, 1f);
-                for (int i = 0; i < _considerationDirections.Count; i++)
+                for (int i = 0; i < _gizmosConsiderationDirections.Length; i++)
                 {
-                    if (_considerationDesirability[i] < 0)
+                    if (_gizmosConsiderationDesirability[i] < 0)
                     {
                         Gizmos.color = Color.red;
                     }
@@ -214,12 +258,12 @@ namespace LNS.AI
                     {
                         Gizmos.color = Color.green;
                     }
-                    Gizmos.DrawSphere(transform.position + _considerationDirections[i] * 1.1f * _considerationDesirability[i], 0.05f);
+                    Gizmos.DrawSphere(transform.position + _gizmosConsiderationDirections[i] * 1.1f * _gizmosConsiderationDesirability[i], 0.05f);
                 }
 
                 for (int i = 0; i < _fixedConsiderationDirections.Length; i++)
                 {
-                    if (_fixedConsiderationDesirability[i] < 0)
+                    if (_fixedConsiderationDesirability[i] > 0)
                     {
                         Gizmos.color = Color.red;
                     }
@@ -227,7 +271,7 @@ namespace LNS.AI
                     {
                         Gizmos.color = Color.green;
                     }
-                    Gizmos.DrawSphere(transform.position + _fixedConsiderationDirections[i] * 1.1f * _fixedConsiderationDesirability[i], 0.05f);
+                    Gizmos.DrawSphere(transform.position + _fixedConsiderationDirections[i] * -1.1f * _fixedConsiderationDesirability[i], 0.05f);
                 }
 
                 int maxInterest = 0;

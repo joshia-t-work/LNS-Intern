@@ -31,6 +31,9 @@ namespace LNS.Entities
         protected int _health = 3;
 
         [SerializeField]
+        protected float _attackCooldownTime = 1f;
+
+        [SerializeField]
         protected bool _startsWithGun = false;
 
         SpriteRenderer _characterSprite;
@@ -41,7 +44,7 @@ namespace LNS.Entities
         }
         public Vector2 TargetAimDirection { get { return _targetAimDirection; } }
         private Vector2 _targetAimDirection = Vector2.zero;
-        protected const float GUNDISTANCE = 20f;
+        public const float GUNDISTANCE = 20f;
         protected const float MELEEDISTANCE = 1.5f;
         protected const float BACKSTAB_DETECTION_CONST = 0.8f;
         public Vector2 AimDirection { get { return _character.transform.right; } }
@@ -53,10 +56,9 @@ namespace LNS.Entities
         {
             get
             {
-                return Time.time - _attackCooldown > ATTACK_COOLDOWN;
+                return Time.time - _attackCooldown > _attackCooldownTime;
             }
         }
-        protected const float ATTACK_COOLDOWN = 1f;
         private float _attackCooldown = 0f;
 
         #endregion
@@ -87,7 +89,7 @@ namespace LNS.Entities
 
             float angle = Mathf.Atan2(_targetAimDirection.y, _targetAimDirection.x) * Mathf.Rad2Deg;
             _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
-             //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
+            //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
             _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
         }
 
@@ -129,7 +131,7 @@ namespace LNS.Entities
             }
             if (IsReloaded)
             {
-                _character.SetFloat("ReloadSpeed", 1.25f / ATTACK_COOLDOWN);
+                _character.SetFloat("ReloadSpeed", 1.25f / _attackCooldownTime);
                 _character.SetTrigger("Fire");
                 if (_isGun)
                 {
@@ -139,7 +141,7 @@ namespace LNS.Entities
                 else
                 {
                     _attackCooldown = Time.time;
-                    StartCoroutine(DelayedMethod(ATTACK_COOLDOWN / 2f, Melee));
+                    StartCoroutine(DelayedMethod(_attackCooldownTime / 2f, Melee));
                 }
             }
         }

@@ -28,4 +28,4 @@ Additionals
 [Done] Split AIEnemy, DummyEnemy into AI and Soldier component
 [Done] Make more advanced AI
 [Done] Add health editor field, make backstab instakill (999 dmg)
-[    ] Add dummy level
+[Done] Add dummy level

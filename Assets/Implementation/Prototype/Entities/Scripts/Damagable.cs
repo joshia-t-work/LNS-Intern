@@ -13,6 +13,7 @@ namespace LNS.Entities
     {
         #region Variables
 
+        public bool IsAlive { get { return Health.Value > 0; } }
         public ObservableValue<int> Health { get; private set; } = new ObservableValue<int>(3);
         public ObservableValue<int> MaxHealth { get; private set; } = new ObservableValue<int>(3);
         public Damagable Owner
