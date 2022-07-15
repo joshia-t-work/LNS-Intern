@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4458513388491750418}
   - component: {fileID: 6353312139934395001}
   - component: {fileID: 7974910482572510984}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 8245735820987761590}
   - component: {fileID: 4555594254119524801}
   - component: {fileID: 7970174066557140035}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ParticleSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4914,7 +4914,7 @@ GameObject:
   - component: {fileID: 7158968469921912396}
   - component: {fileID: 7372895126439737627}
   - component: {fileID: 5498191632161072987}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}

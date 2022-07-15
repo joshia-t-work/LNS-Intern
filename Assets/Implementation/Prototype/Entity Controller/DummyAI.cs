@@ -23,9 +23,8 @@ namespace LNS.Entities
         #endregion
         #region MonoBehaviour
 
-        public override void Awake()
+        public virtual void Awake()
         {
-            base.Awake();
             _pathfinder = new DirectionalPathfinder(DirectionalPathfinder.Behaviours.Stop, 2f, 0.5f, 0.5f);
         }
 
@@ -63,26 +62,6 @@ namespace LNS.Entities
             }
             SetTargetPosition(_targetPosition);
             base.Update();
-        }
-
-        #endregion
-        #region Class Methods
-
-        private bool CanSee(Poolable poolable)
-        {
-            Vector3 aimDir = poolable.transform.position - transform.position;
-            if (Vector3.Dot(_soldier.AimDirection, aimDir) > CONE_DETECTION_CONST)
-            {
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDir, CONE_DETECTION_RANGE);
-                if (hit.collider != null)
-                {
-                    if (poolable.transform == hit.transform)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
 
         #endregion

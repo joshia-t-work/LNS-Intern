@@ -14,7 +14,6 @@ namespace LNS.Entities
         #region Variables
 
         public Vector2 MoveDirection { get; protected set; }
-        public Vector2 AimDirection { get; protected set; }
         protected Rigidbody2D _rb;
         public Rigidbody2D Rb { get { return _rb; } }
         protected float _moveSpeed = 1f;
@@ -31,7 +30,7 @@ namespace LNS.Entities
         }
         public virtual void FixedUpdate()
         {
-            if (MoveDirection != Vector2.zero)
+            if ((MoveDirection != Vector2.zero) && (_moveSpeed != 0f))
             {
                 _rb.AddForce(MoveDirection.normalized * _moveSpeed, ForceMode2D.Impulse);
             }

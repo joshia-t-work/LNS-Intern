@@ -99,6 +99,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1521827062471791905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6316548942328300694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a21517614830d442a3594ce951679a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soldier: {fileID: 4271013776812903343}
+  _canShoot: 0
+  _targetsPlayer: 0
+  _runOnSight: 0
+  PatrolPoints: []
 --- !u!114 &4271013776812903343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,21 +134,3 @@ MonoBehaviour:
   _feet: {fileID: 8687157860366139059}
   _respawnTime: 3
   _startsWithGun: 1
---- !u!114 &5741087940224320508
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6316548942328300694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f6e2a01936eb2f41afbc9ebba8163e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _soldier: {fileID: 4271013776812903343}
-  PatrolPoints: []
-  _aimBehaviour: 0
-  _targetType: Player
-  _aiType: 0
-  _patrolIndex: 0

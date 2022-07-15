@@ -52,7 +52,8 @@ namespace LNS.Entities
             transform.position = position;
             lifetime = distance / MOVE_SPEED;
 
-            AimDirection = aimDirection;
+            _moveSpeed = 0f;
+            MoveDirection = aimDirection;
             float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
             _rb.velocity = Vector2.zero;
@@ -99,7 +100,7 @@ namespace LNS.Entities
         public override void OnCollision(Entity collider)
         {
             collider.PreventCollision();
-            collider.Rb.AddForce(AimDirection.normalized * MOVE_SPEED / 10f, ForceMode2D.Impulse);
+            collider.Rb.AddForce(MoveDirection.normalized * MOVE_SPEED / 10f, ForceMode2D.Impulse);
             DealDamage(1, collider);
             Kill();
         }

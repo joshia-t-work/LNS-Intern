@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7798095888964492888}
   - component: {fileID: 2456259455919252374}
   - component: {fileID: 406218225922893249}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3063910735212174901}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 3063910735369571294}
   - component: {fileID: 3063910735369571292}
   - component: {fileID: 3063910735369571293}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3063910735794461069}
   - component: {fileID: 3063910735794461070}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HP slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 3063910736047398084}
   - component: {fileID: 3063910736047398085}
   - component: {fileID: 3063910736047398086}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -413,7 +413,7 @@ GameObject:
   - component: {fileID: 3063910736195018744}
   - component: {fileID: 3063910736195018746}
   - component: {fileID: 5523076434829715654}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BaseSoldier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -485,7 +485,7 @@ GameObject:
   - component: {fileID: 3063910736229967634}
   - component: {fileID: 3063910736229967633}
   - component: {fileID: 7894205228932430123}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Character
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -587,7 +587,7 @@ GameObject:
   - component: {fileID: 3063910736865900919}
   - component: {fileID: 3063910736865900917}
   - component: {fileID: 3063910736865900918}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

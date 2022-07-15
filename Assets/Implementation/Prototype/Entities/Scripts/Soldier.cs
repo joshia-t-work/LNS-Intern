@@ -41,6 +41,7 @@ namespace LNS.Entities
         protected const float GUNDISTANCE = 20f;
         protected const float MELEEDISTANCE = 1.5f;
         protected const float BACKSTAB_DETECTION_CONST = 0.8f;
+        public Vector2 AimDirection { get { return _character.transform.right; } }
         public Vector3 SpawnPosition { get { return _spawnPosition; } }
         protected Vector3 _spawnPosition;
         private bool _isGun = false;
@@ -81,7 +82,6 @@ namespace LNS.Entities
 
             float angle = Mathf.Atan2(_targetAimDirection.y, _targetAimDirection.x) * Mathf.Rad2Deg;
             _characterSprite.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 5f * Time.deltaTime);
-            AimDirection = _characterSprite.transform.right;
              //angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
             _feet.transform.rotation = Quaternion.Slerp(_characterSprite.transform.rotation, Quaternion.Euler(0, 0, angle), 3f * Time.deltaTime);
         }
@@ -177,11 +177,11 @@ namespace LNS.Entities
                 Damagable damagable = coll.rigidbody.GetComponent<Damagable>();
                 if (damagable != null)
                 {
-                    Entity entity = (Entity)damagable;
-                    entity.Rb.AddForce(AimDirection.normalized * 10f, ForceMode2D.Impulse);
-                    if (entity != null)
+                    Soldier soldier = (Soldier)damagable;
+                    soldier.Rb.AddForce(AimDirection.normalized * 10f, ForceMode2D.Impulse);
+                    if (soldier != null)
                     {
-                        if (Vector3.Dot(AimDirection, entity.AimDirection) > BACKSTAB_DETECTION_CONST)
+                        if (Vector3.Dot(AimDirection, soldier.AimDirection) > BACKSTAB_DETECTION_CONST)
                         {
                             DealDamage(3, damagable);
                         } else

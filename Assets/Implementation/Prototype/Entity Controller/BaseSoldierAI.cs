@@ -35,7 +35,6 @@ namespace LNS.Entities
             FireOnCommand,
         }
 
-        private List<Vector3> _aiPaths = new List<Vector3>();
         private Vector3 _targetPosition;
         private float _randomRetargetTime;
 
@@ -50,10 +49,6 @@ namespace LNS.Entities
         #endregion
         #region MonoBehaviour
 
-        public virtual void Awake()
-        {
-            _aiPaths.Add(_soldier.SpawnPosition);
-        }
         public virtual void Update()
         {
             // If it does not target anything, aim into a random direction
@@ -71,11 +66,15 @@ namespace LNS.Entities
             {
                 Poolable[] targets = InstancePool.GetInstances(_targetType);
                 _isTargetVisible = false;
+                aimDirection = _soldier.MoveDirection;
                 if (targets.Length > 0)
                 {
                     _target = targets[0];
                     _isTargetVisible = CanSee(targets[0]);
-                    aimDirection = targets[0].transform.position - transform.position;
+                    if (_isTargetVisible)
+                    {
+                        aimDirection = targets[0].transform.position - transform.position;
+                    }
                 }
             }
             // Try to fire when target is visible or if it is aiming randomly
@@ -85,12 +84,9 @@ namespace LNS.Entities
                 switch (_aimBehaviour)
                 {
                     case FireBehaviour.Hold:
-                        if (_isTargetVisible)
+                        if (!_isTargetVisible)
                         {
-                            _soldier.SetAimDirection(aimDirection);
-                        } else
-                        {
-                            _soldier.SetAimDirection(_soldier.MoveDirection);
+                            aimDirection = _soldier.MoveDirection;
                         }
                         break;
                     case FireBehaviour.AlwaysFire:
@@ -99,33 +95,31 @@ namespace LNS.Entities
                         //    _soldier.SetAimDirection(Random.insideUnitCircle);
                         //    _randomRetargetTime = Time.time;
                         //}
-                        _soldier.SetAimDirection(aimDirection);
                         if (_soldier.IsReloaded)
                         {
                             _soldier.Attack();
                         }
                         break;
                     case FireBehaviour.FireAtWill:
-                        _soldier.SetAimDirection(aimDirection);
                         if (_soldier.IsReloaded)
                         {
                             _soldier.Attack();
                         }
                         break;
                     case FireBehaviour.FireOnCommand:
-                        _soldier.SetAimDirection(aimDirection);
                         break;
                     default:
                         break;
                 }
             }
+            _soldier.SetAimDirection(aimDirection);
             _soldier.SetMoveDirection(_pathfinder.EvaluateDirectionToTarget(transform.position, _targetPosition, _soldier.MoveDirection.normalized));
         }
 
         #endregion
         #region Debugging
 
-        private void OnDrawGizmosSelected()
+        public virtual void OnDrawGizmosSelected()
         {
             _pathfinder.DebugGizmos(transform);
             Quaternion rotationVector = Quaternion.Euler(0f, 0f, Mathf.Acos(CONE_DETECTION_CONST) * Mathf.Rad2Deg);
@@ -150,7 +144,7 @@ namespace LNS.Entities
         {
             _targetPosition = position;
         }
-        private bool CanSee(Poolable poolable)
+        protected bool CanSee(Poolable poolable)
         {
             Vector3 aimDir = poolable.transform.position - _soldier.transform.position;
             if (Vector3.Dot(_soldier.AimDirection.normalized, aimDir.normalized) > CONE_DETECTION_CONST)
