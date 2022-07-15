@@ -28,6 +28,9 @@ namespace LNS.Entities
         protected float _respawnTime = 5f;
 
         [SerializeField]
+        protected int _health = 3;
+
+        [SerializeField]
         protected bool _startsWithGun = false;
 
         SpriteRenderer _characterSprite;
@@ -65,6 +68,8 @@ namespace LNS.Entities
             _spawnPosition = transform.position;
             _targetAimDirection = _character.transform.right;
             _characterSprite = _character.GetComponent<SpriteRenderer>();
+            MaxHealth.Value = _health;
+            Health.Value = MaxHealth.Value;
             Health.AddObserver((value) =>
             {
                 _healthbar.value = (float)value / MaxHealth.Value;
@@ -183,7 +188,7 @@ namespace LNS.Entities
                     {
                         if (Vector3.Dot(AimDirection, soldier.AimDirection) > BACKSTAB_DETECTION_CONST)
                         {
-                            DealDamage(3, damagable);
+                            DealDamage(999, damagable);
                         } else
                         {
                             DealDamage(1, damagable);
