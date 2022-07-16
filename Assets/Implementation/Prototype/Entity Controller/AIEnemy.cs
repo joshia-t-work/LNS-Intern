@@ -36,6 +36,9 @@ namespace LNS.Entities
         private States _aiState = States.Rest;
         private float _chaseGuardTime;
         private const float CHASE_GUARD_DURATION = 4f;
+        private const float UNREACHABLE_CHECK_TIME = 2f;
+        private bool _isUnreachable;
+        private float _unreachableCheck;
         protected enum States
         {
             Rest,
@@ -183,10 +186,17 @@ namespace LNS.Entities
                         {
                             _lastTargetPosition = _target.transform.position;
                         }
+                        _isUnreachable = false;
+                        _unreachableCheck = Time.time;
                     }
                     else
                     {
-                        if (Vector2.Distance(transform.position, _lastTargetPosition) < REACH_POINT_DISTANCE || !CanSeePoint(_lastTargetPosition))
+                        if (Time.time - _unreachableCheck > UNREACHABLE_CHECK_TIME)
+                        {
+                            _isUnreachable = !CanSeePoint(_lastTargetPosition, 10);
+                            _unreachableCheck = Time.time;
+                        }
+                        if (Vector2.Distance(transform.position, _lastTargetPosition) < REACH_POINT_DISTANCE || _isUnreachable)
                         {
                             StopChase();
                         } else
@@ -274,11 +284,23 @@ namespace LNS.Entities
         {
             _pathfinder.AddKeepDistanceConsideration(position - transform.position, desiribility, distance);
         }
-        public bool CanSeePoint(Vector3 point)
+        public bool CanSeePoint(Vector3 point, int tries = 1)
         {
             Vector3 directionVector = point - transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionVector, directionVector.magnitude, LayerMask.GetMask("Level"));
-            return hit.collider == null;
+            if (tries == 1)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, directionVector, directionVector.magnitude, LayerMask.GetMask("Level"));
+                return (hit.collider == null);
+            }
+            for (int i = 0; i < tries; i++)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(transform.position + (Vector3)Random.insideUnitCircle, directionVector, directionVector.magnitude, LayerMask.GetMask("Level"));
+                if (hit.collider == null)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void CommandChasePoint(Vector3 point)
@@ -303,6 +325,11 @@ namespace LNS.Entities
                     {
                         Gizmos.DrawLine(_retracePath[i], _retracePath[i + 1]);
                     }
+                }
+                if (_aiState == States.Chase)
+                {
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawLine(transform.position, _lastTargetPosition);
                 }
             }
         }
