@@ -43,10 +43,17 @@ namespace LNS.ObjectPooling
 
         #endregion
         #region Class Methods
-
-        public static Poolable[] GetInstances(string type)
+        
+        public static List<Poolable> GetInstances(string type)
         {
-            return s_inst._activePool[type].ToArray();
+            try
+            {
+                return s_inst._activePool[type];
+            }
+            catch (KeyNotFoundException)
+            {
+                return new List<Poolable>();
+            }
         }
         /// <summary>
         /// Creates an instance of the type from pool or instantiate a new one if it does not exist

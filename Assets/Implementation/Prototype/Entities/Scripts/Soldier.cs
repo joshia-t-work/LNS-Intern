@@ -36,6 +36,9 @@ namespace LNS.Entities
         [SerializeField]
         protected bool _startsWithGun = false;
 
+        [SerializeField]
+        protected float _spread = 2f;
+
         SpriteRenderer _characterSprite;
         Collider2D[] _collider;
         public Collider2D[] Collider
@@ -98,11 +101,14 @@ namespace LNS.Entities
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + (Vector3)_targetAimDirection);
-            if (_characterSprite != null)
+            if (DEBUGSETTINGS.DETAIL > 1)
             {
-                ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(transform.position, transform.position + (Vector3)_targetAimDirection);
+                if (_characterSprite != null)
+                {
+                    ExtDebug.ExtDebug.DrawBoxCast2D(_characterSprite.transform.position, new Vector2(1, 2), _characterSprite.transform.eulerAngles.z, _characterSprite.transform.right, 1.5f, Color.white);
+                }
             }
         }
 
@@ -165,7 +171,7 @@ namespace LNS.Entities
         private void Fire()
         {
             Poolable bullet = InstancePool.TryInstantiate("Bullet");
-            Quaternion leftRotation = Quaternion.Euler(0, 0, Random.Range(-2f, 2f));
+            Quaternion leftRotation = Quaternion.Euler(0, 0, Random.Range(-_spread, _spread));
             bullet.GetComponent<Bullet>().SetBullet(this, GUNDISTANCE, _characterSprite.transform.position + _characterSprite.transform.up * -0.54f + _characterSprite.transform.right * 1.2f, leftRotation * AimDirection);
             //if (_hit.rigidbody != null)
             //{

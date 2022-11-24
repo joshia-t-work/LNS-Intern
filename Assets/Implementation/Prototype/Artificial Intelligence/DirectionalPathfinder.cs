@@ -8,28 +8,23 @@ namespace LNS.AI
     {
         #region Variables
 
-        public enum Behaviours
-        {
-            KeepDistance,
-            Stop
-        }
-        private Behaviours _behaviourOnTargetReach;
         private float _collisionDetectionRange = 2f;
         private float _collisionDetectionSensitivity = 0.3f;
 
-        //List<Consideration> considerations = new List<Consideration>();
-        Vector3[] _gizmosConsiderationDirections = new Vector3[0];
-        float[] _gizmosConsiderationDesirability = new float[0];
+        List<Vector3> _gizmosConsiderationDirections = new List<Vector3>();
+        List<float> _gizmosConsiderationDesirability = new List<float>();
         List<Vector3> _considerationDirections = new List<Vector3>();
         List<float> _considerationDesirability = new List<float>();
         Vector3[] _fixedConsiderationDirections = new Vector3[0];
         float[] _fixedConsiderationDesirability = new float[0];
-        int _interestCount = 32;
+        const int _interestCount = 32;
         Vector3[] _interest = new Vector3[0];
         float[] _interestMultiplier = new float[0];
         Vector3 _targetPosition;
         Vector3 _targetVec;
 
+        const float KEEP_DIST_MIN = 0.4f;
+        const float KEEP_DIST_MAX = 0.8f;
         private float _keepDistance;
 
         #endregion
@@ -41,16 +36,16 @@ namespace LNS.AI
         /// </summary>
         /// <param name="behaviour">Whether returns a direction on reaching target to maintain distance or Vector.zero</param>
         /// <param name="collisionDetectionRange">Distance a collider is detected</param>
-        /// <param name="collisionDetectionSensitivity">How much the object avoids collision, 1 means total stop upon detecting collider</param>
+        /// <param name="collisionDetectionSensitivity">How much the object avoids collision, 1 means total stop upon detecting collider (avoid collision at all cost)</param>
         /// <param name="keepDistance">Maintain this amount of distance from target</param>
-        public DirectionalPathfinder(Behaviours behaviour, float collisionDetectionRange, float collisionDetectionSensitivity, float keepDistance)
+        public DirectionalPathfinder(float collisionDetectionRange, float collisionDetectionSensitivity, float keepDistance)
         {
-            _behaviourOnTargetReach = behaviour;
             _collisionDetectionRange = collisionDetectionRange;
             _collisionDetectionSensitivity = collisionDetectionSensitivity;
             _keepDistance = keepDistance;
 
             _interest = new Vector3[_interestCount];
+            _interestMultiplier = new float[_interestCount];
             _fixedConsiderationDirections = new Vector3[_interestCount];
             _fixedConsiderationDesirability = new float[_interestCount];
             for (int i = 0; i < _interestCount; i++)
@@ -63,10 +58,6 @@ namespace LNS.AI
         #endregion
         #region Class Methods
 
-        public void SetBehaviour(Behaviours behaviour)
-        {
-            _behaviourOnTargetReach = behaviour;
-        }
         public void SetKeepDistance(float keepDistance)
         {
             _keepDistance = keepDistance;
@@ -86,23 +77,7 @@ namespace LNS.AI
             _targetVec = (_targetPosition - fromPosition);
             float dist = _targetVec.magnitude;
             _targetVec = _targetVec.normalized;
-            switch (_behaviourOnTargetReach)
-            {
-                case Behaviours.KeepDistance:
-                    AddKeepDistanceConsideration(_targetVec, 1f, _keepDistance);
-                    break;
-                case Behaviours.Stop:
-                    if (dist < _keepDistance)
-                    {
-                        ClearConsiderations();
-                        return Vector3.zero;
-                    }
-                    else
-                    {
-                        AddConsideration(_targetVec, 1f);
-                    }
-                    break;
-            }
+            AddKeepDistanceConsideration(_targetVec, 1f, _keepDistance);
 
             return evaluateDirectionToTarget(fromPosition);
         }
@@ -128,7 +103,6 @@ namespace LNS.AI
                 return Vector3.zero;
             }
 
-            _interestMultiplier = new float[_interestCount];
             for (int i = 0; i < _interestCount; i++)
             {
                 _interestMultiplier[i] = 1f;
@@ -137,27 +111,17 @@ namespace LNS.AI
             for (int i = 0; i < _interestCount; i++)
             {
                 _fixedConsiderationDesirability[i] = 0f;
-                //RaycastHit2D[] hits = Physics2D.RaycastAll(fromPosition, interest[i], collisionDetectionRange);
-                //for (int j = 0; j < hits.Length; j++)
-                //{
-                //    Rigidbody2D collider = hits[j].rigidbody;
-                //    if (collider == rb)
-                //    {
-                //        continue;
-                //    }
-                //    fixedConsiderationDesirability[2 + i] = collisionDetectionSensitivity;
-                //    interestMultiplier[i] = 0;
-                //    break;
-                //}
-                RaycastHit2D hit = Physics2D.Raycast(fromPosition, _interest[i], _collisionDetectionRange);
-                if (hit.collider != null)
+                int layerMask = ~LayerMask.GetMask("Ball");
+                bool hit = Physics.Raycast(fromPosition, _interest[i], _collisionDetectionRange, layerMask);
+                if (hit)
                 {
                     _fixedConsiderationDesirability[i] = _collisionDetectionSensitivity;
-                    _interestMultiplier[i] = 0;
+                    //_interestMultiplier[i] = 0;
+                    //AddConsideration()
                 }
             }
 
-            Vector2 currentVec;
+            Vector3 currentVec;
             for (int i = 0; i < _interestCount; i++)
             {
                 if (_fixedConsiderationDesirability[i] == 0)
@@ -187,8 +151,8 @@ namespace LNS.AI
                     maxInterest = i;
                 }
             }
-            _gizmosConsiderationDirections = _considerationDirections.ToArray();
-            _gizmosConsiderationDesirability = _considerationDesirability.ToArray();
+            _gizmosConsiderationDirections = new List<Vector3>(_considerationDirections);
+            _gizmosConsiderationDesirability = new List<float>(_considerationDesirability);
             ClearConsiderations();
             return _interest[maxInterest];
         }
@@ -204,18 +168,29 @@ namespace LNS.AI
         /// </summary>
         /// <param name="direction">Direction towards target position, do NOT normalize</param>
         /// <param name="desiribility">Amount of desire to move towards</param>
-        public void AddKeepDistanceConsideration(Vector3 direction, float desiribility, float distance)
+        public void AddKeepDistanceConsideration(Vector3 direction, float desiribility, float maintainDistance)
         {
             if (desiribility == 0)
             {
                 return;
             }
+            float dist = direction.magnitude;
             float distSq = direction.sqrMagnitude;
-            float keepDistSq = distance * distance * 1f;
-            if (distSq < keepDistSq)
+            float keepDist = maintainDistance * 1.414213f; // sqrt(2)
+            float keepDistSq = maintainDistance * maintainDistance * 2;
+            if (dist < keepDist * KEEP_DIST_MIN)
             {
-                _considerationDirections.Add(direction.normalized * (2f * distSq / keepDistSq - 1f));
-                _considerationDesirability.Add(Mathf.Abs(0.5f - distSq / keepDistSq) * desiribility);
+                _considerationDirections.Add(-direction.normalized);
+                _considerationDesirability.Add(desiribility);
+            }
+            else if (dist < keepDist * KEEP_DIST_MAX)
+            {
+                // Interpolation formula
+                float multiplier = 1f / (KEEP_DIST_MAX - KEEP_DIST_MIN);
+                float interpolatedDist = multiplier * (dist - KEEP_DIST_MIN * keepDist);
+                float interpolatedDistSq = interpolatedDist * interpolatedDist;
+                _considerationDirections.Add(direction.normalized * (2f * interpolatedDistSq / keepDistSq - 1f));
+                _considerationDesirability.Add(2f * Mathf.Abs(0.5f - interpolatedDistSq / keepDistSq) * desiribility);
             }
             else
             {
@@ -248,7 +223,7 @@ namespace LNS.AI
             {
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(transform.position, 1f);
-                for (int i = 0; i < _gizmosConsiderationDirections.Length; i++)
+                for (int i = 0; i < _gizmosConsiderationDirections.Count; i++)
                 {
                     if (_gizmosConsiderationDesirability[i] < 0)
                     {

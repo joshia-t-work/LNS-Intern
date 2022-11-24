@@ -16,17 +16,17 @@ namespace LNS.Entities
         public override void Awake()
         {
             base.Awake();
-            _cam.SetTarget(transform);
+            _cam.SetTarget(this);
         }
         public override void OnKilledBy(Damagable other)
         {
             base.OnKilledBy(other);
-            _cam.SetTarget(other.TraceOwner().transform);
+            _cam.SetTarget((Soldier)other.TraceOwner());
         }
         public override void OnRespawn()
         {
             base.OnRespawn();
-            _cam.SetTarget(transform);
+            _cam.SetTarget(this);
         }
     }
 }

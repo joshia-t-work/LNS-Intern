@@ -157,11 +157,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolableType: {fileID: 11400000, guid: 17c9f59a323e7264289729db20db8a55, type: 2}
+  Team: Player
   _healthbar: {fileID: 4596251343000867122}
   _character: {fileID: 8701448705019883927}
   _feet: {fileID: 1220253368176225661}
-  _meleeSprite: {fileID: 21300000, guid: 4e6de2feee898cb4dadcdb558e50083e, type: 3}
-  _gunSprite: {fileID: 21300000, guid: 81bee05057191784fb9dcdfc56717ba1, type: 3}
+  _respawnTime: 5
+  _health: 3
+  _attackCooldownTime: 1
+  _startsWithGun: 0
   _cam: {fileID: 0}
 --- !u!114 &5149874997730005971
 MonoBehaviour:

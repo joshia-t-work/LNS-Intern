@@ -16,7 +16,7 @@ namespace LNS.Entities
         [Header("AI Settings")]
 
         [SerializeField]
-        protected Soldier _soldier;
+        public Soldier _soldier;
 
         [SerializeField]
         public Vector3[] PatrolPoints;
@@ -25,7 +25,10 @@ namespace LNS.Entities
         private AimBehaviour _aimBehaviour;
 
         [SerializeField]
-        private string _targetType;
+        private TargetBehaviour _targetBehaviour;
+
+        [SerializeField]
+        protected string _targetType;
 
         public enum AimBehaviour
         {
@@ -34,15 +37,21 @@ namespace LNS.Entities
             FireAtWill,
         }
 
+        public enum TargetBehaviour
+        {
+            AlwaysSearch,
+            DoNotSearch,
+        }
+
         private float _randomRetargetTime;
 
-        protected DirectionalPathfinder _pathfinder = new DirectionalPathfinder(DirectionalPathfinder.Behaviours.Stop, 1.5f, 0.5f, 0.5f);
+        protected DirectionalPathfinder _pathfinder = new DirectionalPathfinder(1.5f, 0.5f, 0.5f);
         protected const float CONE_DETECTION_CONST = 0.75f;
         protected const float CONE_DETECTION_RANGE = 25f;
         protected const float REACH_POINT_DISTANCE = 1f;
         protected const float RANDOM_RETARGET_TIME = 1f;
         protected bool _isTargetVisible { get; private set; }
-        protected Poolable _target { get; private set; }
+        protected Poolable _target { get; private set; } = null;
 
         #endregion
         #region MonoBehaviour
@@ -55,7 +64,6 @@ namespace LNS.Entities
         {
             // If it does not target anything, aim into a random direction
             Vector2 aimDirection = _soldier.TargetAimDirection;
-            _target = null;
             if (_targetType == "")
             {
                 _isTargetVisible = false;
@@ -66,26 +74,36 @@ namespace LNS.Entities
                 }
             } else
             {
-                Poolable[] targets = InstancePool.GetInstances(_targetType);
                 _isTargetVisible = false;
                 if (_soldier.MoveDirection != Vector2.zero)
                 {
                     aimDirection = _soldier.MoveDirection;
                 }
-                if (targets.Length > 0)
+                if (_targetBehaviour == TargetBehaviour.AlwaysSearch)
                 {
-                    _target = targets[0];
-                    _isTargetVisible = CanSee(targets[0]);
-                    if (_isTargetVisible)
+                    List<Poolable> targets = InstancePool.GetInstances(_targetType);
+                    for (int i = 0; i < targets.Count; i++)
                     {
-                        aimDirection = targets[0].transform.position - transform.position;
-                        // prediction
-                        Entity entity = (Entity)targets[0];
+                        Entity entity = (Entity)targets[i];
                         if (entity != null)
                         {
-                            Vector3 predictedMove = Random.Range(1f, 2f) * entity.Rb.velocity * (aimDirection.magnitude / Bullet.MOVE_SPEED);
-                            aimDirection = targets[0].transform.position + predictedMove - transform.position;
+                            if (entity.Team != _soldier.Team)
+                            {
+                                _target = entity;
+                                break;
+                            }
                         }
+                    }
+                }
+                if (_target != null)
+                {
+                    _isTargetVisible = CanSee(_target);
+                    if (_isTargetVisible)
+                    {
+                        aimDirection = _target.transform.position - transform.position;
+                        // prediction
+                        Vector3 predictedMove = Random.Range(1f, 2f) * ((Entity)_target).Rb.velocity * (aimDirection.magnitude / Bullet.MOVE_SPEED);
+                        aimDirection = _target.transform.position + predictedMove - transform.position;
                     }
                 }
             }
@@ -120,20 +138,40 @@ namespace LNS.Entities
 
         public virtual void OnDrawGizmosSelected()
         {
-            _pathfinder.DebugGizmos(transform);
-            Quaternion rotationVector = Quaternion.Euler(0f, 0f, Mathf.Acos(CONE_DETECTION_CONST) * Mathf.Rad2Deg);
-            Vector3 left = rotationVector * _soldier.AimDirection;
-            Vector3 right = Quaternion.Inverse(rotationVector) * _soldier.AimDirection;
-            Gizmos.color = Color.gray;
-            if (_isTargetVisible)
+            if (DEBUGSETTINGS.DETAIL > 0)
             {
-                Gizmos.color = Color.black;
+                //_pathfinder.DebugGizmos(transform);
             }
-            Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + left * CONE_DETECTION_RANGE);
-            Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + right * CONE_DETECTION_RANGE);
-            Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE);
-            Gizmos.DrawLine(_soldier.transform.position + left * CONE_DETECTION_RANGE, _soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE);
-            Gizmos.DrawLine(_soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE, _soldier.transform.position + right * CONE_DETECTION_RANGE);
+            if (DEBUGSETTINGS.DETAIL > 1)
+            {
+                Quaternion rotationVector = Quaternion.Euler(0f, 0f, Mathf.Acos(CONE_DETECTION_CONST) * Mathf.Rad2Deg);
+                Vector3 left = rotationVector * _soldier.AimDirection;
+                Vector3 right = Quaternion.Inverse(rotationVector) * _soldier.AimDirection;
+                Gizmos.color = Color.gray;
+                if (_isTargetVisible)
+                {
+                    Gizmos.color = Color.black;
+                }
+                Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + left * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + right * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_soldier.transform.position, _soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_soldier.transform.position + left * CONE_DETECTION_RANGE, _soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE);
+                Gizmos.DrawLine(_soldier.transform.position + (Vector3)_soldier.AimDirection * CONE_DETECTION_RANGE, _soldier.transform.position + right * CONE_DETECTION_RANGE);
+            }
+            if (DEBUGSETTINGS.DETAIL > 0)
+            {
+                if (_target != null)
+                {
+                    if (CanSee(_target))
+                    {
+                        Gizmos.color = Color.red;
+                    } else
+                    {
+                        Gizmos.color = Color.green;
+                    }
+                    Gizmos.DrawLine(_soldier.transform.position, _target.transform.position);
+                }
+            }
         }
 
         #endregion
@@ -154,6 +192,10 @@ namespace LNS.Entities
                 }
             }
             return false;
+        }
+        public void SetTarget(Poolable poolable)
+        {
+            _target = poolable;
         }
 
         #endregion

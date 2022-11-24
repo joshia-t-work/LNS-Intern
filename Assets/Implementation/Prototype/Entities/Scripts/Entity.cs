@@ -20,6 +20,7 @@ namespace LNS.Entities
         private Vector2 _previousVel;
         private float _previousAngVel;
         private Vector3 _previousPos;
+        public string Team;
 
         #endregion
         #region MonoBehaviour

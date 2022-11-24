@@ -112,10 +112,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolableType: {fileID: 11400000, guid: 8f5b39209e948d340a6072402d0fd237, type: 2}
+  Team: Enemy
   _healthbar: {fileID: 6316548940841419516}
   _character: {fileID: 1197966896947634777}
   _feet: {fileID: 8687157860366139059}
   _respawnTime: 3
+  _health: 3
+  _attackCooldownTime: 1
   _startsWithGun: 1
 --- !u!114 &5741087940224320508
 MonoBehaviour:
@@ -134,4 +137,4 @@ MonoBehaviour:
   _aimBehaviour: 0
   _targetType: Player
   _aiType: 0
-  _patrolIndex: 0
+  _commanderPlatoon: []
